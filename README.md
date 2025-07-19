@@ -1,12 +1,53 @@
-# React + Vite
+# BookYourMovie
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Проект — сайт для бронирования билетов в кинотеатр.
 
-Currently, two official plugins are available:
+## Описание
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Этот проект позволяет
 
-## Expanding the ESLint configuration
+гостю:
+-Просматривать расписание
+-Просматривать информацию о фильмах
+-Выбирать места в кинозале
+-Бронировать билеты
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+администратору:
+-Создавать или редактировать залы.
+-Создавать или редактировать списки фильмов.
+-Настраивать цены
+-Создавать или редактировать расписание сеансов фильмов.
+ 
+
+## Запуск проекта
+npm run dev
+
+
+## Текущий статус
+Проект инициализирован, создана базовая структура.
+
+Реализована базовая настройка React + Vite.
+
+Произведена организация папок внутри проекта
+
+
+
+## Этапы разработки
+1. Выполнить верстку предоставленных макетов
+Верстка должна корректно отображаться в браузере chrome на устройствах с шириной экрана 320px и более.
+В наименовании CSS-классов желательно придерживаться методологии БЭМ
+Верстка должна быть валидной (Валидатор).
+Для быстрой адаптации используем систему сеток BootStrap.
+2. Разработка класс API для взаимодействия с Backend.
+3. Программирование админской части сайта.
+4. Программирование клиентской части сайта.
+
+## Технологии
+
+- React  
+- Vite  
+- JavaScript (или TypeScript, если используешь)  
+- React Router  
+- ... (дополнить по мере развития)
+
+

@@ -1,0 +1,11 @@
+.layout {
+  background-image: url('../../assets/images/client_background_image.jpg');
+  background-size: cover;
+  background-position: center;
+  min-height: 100vh;
+}
+
+/*.seat-map {
+  /* Можно добавить стили для отображения сетки мест */
+ /* gap: 10px;
+}
