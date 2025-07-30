@@ -1,13 +1,15 @@
-import React from 'react';
-import { useState } from 'react';
+import React from "react";
+//import SeatSelection from "./client/pages/SeatSelection";
+//import MovieList from "./client/pages/MovieList";
+//import Payment from "./client/pages/Payment";
+import Ticket from "./client/pages/Ticket";
 
-import Layout from './client/components/Layout'; // путь зависит от вашей структуры
 
 function App() {
-  const [count, setCount] = useState(0);
-  return (
-    <Layout />
-  );
+  //return <SeatSelection />;
+  //return <MovieList />;
+  //return <Payment />;
+  return <Ticket />;
 }
 
 export default App;

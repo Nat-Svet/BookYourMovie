@@ -1,0 +1,109 @@
+html,
+body,
+#root {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  overflow-x: hidden; /* Запрет горизонтального скролла страницы */
+}
+
+/* Контейнеры  */
+.movie-list-container,
+.dates-nav,
+.movie-list-movies {
+  max-width: 990px;
+  /*width: 100%;*/
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* Отступ между карточками фильмов */
+.movie-list-movies {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  margin-top: 15px;
+}
+
+/* Хедер с кнопкой */
+.movie-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  height: 60px;
+  width: 100%;
+}
+
+/* --- Адаптивные стили --- */
+
+/* Мобильные устройства (767px и ниже) */
+@media (max-width: 767px) {
+  .movie-list-container {
+    position: relative;
+    left: 0;
+    right: 0;
+    width: 100%;
+    margin-left: 0;
+    margin-right: 0;
+  }
+
+  .dates-list {
+    overflow-x: auto;
+  }
+
+  .date-item {
+    max-width: none !important;
+    flex-grow: 1;
+    flex-basis: 0;
+  }
+
+  .arrow-button {
+    max-width: none !important;
+    flex-grow: 1 !important;
+    flex-basis: 0 !important;
+    height: 48px;
+    width: auto !important;
+  }
+}
+
+
+/* Планшеты  */
+@media (min-width: 768px) and (max-width: 1199px) {
+
+  .movie-list-container,
+  .dates-nav,
+  .movie-list-movies {
+    max-width: 100% !important; /* убираем ограничение ширины */
+    margin-left: 0 !important; /* убираем автоматические отступы */
+    margin-right: 0 !important;
+    padding-left: 0 !important; /* если есть padding, убрать */
+    padding-right: 0 !important;
+    width: 100% !important;
+  }
+
+  .dates-list {
+    overflow-x: auto; /* Включаем горизонтальный скролл */
+  }
+
+  .date-item {
+    max-width: none !important;
+    flex-grow: 1;
+    flex-basis: 0;
+  }
+
+  .arrow-button {
+    max-width: none !important;
+    flex-grow: 1 !important;
+    flex-basis: 0 !important;
+    height: 48px; /* чтобы совпадала по высоте */
+    width: auto !important; /* чтобы ширина подстраивалась */
+  }
+
+}
+
+.layout {
+  max-height: fit-content;
+  overflow: hidden;   /* чтобы обрезать лишний фон */
+}

@@ -1,0 +1,120 @@
+.cinema-hall-container {
+  max-width: 990px;
+  margin: 0 auto;
+}
+
+/* поскольку экспортировать изображение не получается, создаю свой экран */
+.screen {
+  width: 284px;         /* ширина ровно как 12 ячеек */
+  height: 20px;         /* тонкая полоска экрана */
+  margin: 0 auto 20px auto;
+  border: 1px solid #999;
+  color: #ccc;
+  font-weight: 600;
+  font-size: 14px;
+  text-transform: lowercase;  
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  user-select: none;
+  background: transparent;   
+}
+
+
+/* Ряд мест: flex-контейнер фиксированной ширины */
+.seat-row {
+  display: flex;
+  justify-content: center; /* выравнивание по центру контейнера */
+  width: 100%; /* 284px из контейнера */
+  gap: 1px;
+  margin-bottom: 0.2rem; /* регулирует высоту между рядами */
+}
+
+/* разбираемся с местами */
+
+/* Все места — фиксированного размера */
+.seat {
+  width: 20px;
+  height: 20px;
+  margin: 1px;
+  padding: 0;
+  text-align: center;
+  line-height: 28px;
+  font-size: 12px;
+  border-radius: 4px !important; 
+}
+
+/* Пустое место — прозрачное, но занимает место */
+.empty-seat {
+  width: 20px;
+  height: 20px;
+  margin: 1px;
+  pointer-events: none;
+  background: transparent !important;
+  border: none !important;  
+}
+
+.vip-seat {
+  background-color: #F9953A !important;
+  border-color: #F9953A !important;
+  color: #fff !important;
+}
+
+.vip-seat:hover,
+.vip-seat:focus {
+  background-color: #e6852f !important; /* чуть темнее при наведении */
+  border-color: #e6852f !important;
+  color: #fff !important;
+}
+
+.seat.btn-info {
+  transform: scale(1.2);       /* увеличиваем размер на 20% */
+  transition: transform 0.2s ease; /* плавный переход */
+  z-index: 2;                  /* чтобы выделенные места были поверх остальных */
+}
+
+/* Цвета квадратиков мест */
+
+.free-seat {
+  background-color: #FFFFFF; /* свободное место */
+}
+
+.busy-seat {
+  background-color: #525252; /* темный цвет для занято */
+}
+
+.vip-seat {
+  background-color: #F9953A; /* VIP оранжевый */
+}
+
+.selected-seat {
+  background-color: #25C4CE; /* выбранный голубой */
+}
+
+
+
+/* разбираемся с легендой  */
+
+.legend {
+ font-size: 14px;
+ font-weight: 300;
+ color: #FFFFFF;
+ user-select: none;
+ margin-left: 70px;
+}
+
+.legend-column {
+    min-width: 150px; /* задаем ширину колонок */
+}
+
+.legend-color {
+  width: 20px !important;
+  height: 20px !important;
+  border-radius: 4px !important;
+  border: 1px solid #525252 !important;
+}
+
+
+
+
+

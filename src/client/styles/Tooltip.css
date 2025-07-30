@@ -1,0 +1,26 @@
+.tooltip-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  position: absolute; /* или relative в зависимости от места размещения */
+  top: 10px; /* подкорректировать по макету */
+  right: 10px; /* подкорректировать по макету */
+  background: transparent;
+  user-select: none;
+  margin-top: 1rem;
+  margin-right: 1rem;
+}
+
+.tooltip-icon {
+  width: 24px; /* под размер иконки из макета */
+  height: auto;
+  
+}
+
+.tooltip-text {
+  font-size: 14px;
+  color: #000;
+  font-weight: 200;
+  line-height: 1.2;
+  white-space: pre-line; /* чтобы переносы <br> работали */
+}

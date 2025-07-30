@@ -3,9 +3,31 @@
   background-size: cover;
   background-position: center;
   min-height: 100vh;
+  width: 100%;
+  
 }
 
-/*.seat-map {
-  /* Можно добавить стили для отображения сетки мест */
- /* gap: 10px;
+.no-padding {
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+  padding-bottom: 0 !important;
+  
 }
+
+.container.no-padding {
+  max-width: 100% !important;
+  width: 100% !important;
+  margin-left: 0 !important;
+  margin-right: 0 !important;
+  padding-left: 0 !important;
+  padding-right: 0 !important;
+}
+
+/* Планшетная версия — ограничиваем высоту layout (нужно вернуться еще подумать) */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .layout {
+    max-height: 700px; /* не забыть проверить значение под высоту контента + кнопки */
+    overflow: hidden;  /* скрываем фон ниже карточки */
+  }
+}
+

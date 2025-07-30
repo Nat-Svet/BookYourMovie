@@ -1,0 +1,28 @@
+.custom-button {
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  background-color: #16a6af;
+  color: #FFFFFF;
+  transition: background-color 0.3s;
+}
+
+.custom-button:hover {
+  background-color: #25C4CE;
+}
+
+/* Размеры, если понадобятся разные кнопки на разных страницах */
+.custom-button--small {
+  padding: 6px 12px;
+  font-size: 0.875rem;
+}
+
+.custom-button--medium {
+  padding: 10px 20px;
+  font-size: 1rem;
+}
+
+.custom-button--large {
+  padding: 14px 28px;
+  font-size: 1.125rem;
+}
