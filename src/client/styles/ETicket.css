@@ -6,7 +6,22 @@
   color: #C76F00;
   border-radius: 8px;
   box-shadow: 0 0 6px rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
   }
+
+  .ticket-container {
+  background: #F1EBE6;
+  opacity: 0.95;
+  max-width: 100%;
+  padding: 40px 30px 40px 30px; /* увеличим отступы */
+  color: #C76F00;
+  border-radius: 8px;
+  box-shadow: 0 0 6px rgba(0,0,0,0.1);
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+}
 
 .ticket-title {
   font-weight: 700;

@@ -1,0 +1,172 @@
+.admin-page-wrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    /* содержимое по центру */
+
+}
+
+.admin-page-block {
+    margin-top: 50px;
+}
+
+
+.admin-page-container {
+    max-width: 1200px;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 20px;
+}
+
+.admin-container {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+}
+
+
+
+
+/* ----- Мобильная версия (0–767px) ----- */
+@media (max-width: 767px) {
+    .admin-page-wrapper {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+        padding: 0;
+        /* убрали боковые отступы */
+        display: flex;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .admin-page-wrapper>* {
+        width: 100%;
+        max-width: none;
+        margin: 0;
+    }
+
+    /* убираем фиксированную ширину и отступы у внутренних блоков */
+    .manage-halls,
+    .config-hall,
+    .config-prices,
+    .sessions,
+    .open-sale {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+
+    }
+
+    /* сброс левого отступа у контента конфигурации залов */
+    .config-hall-content {
+        margin-left: 0 !important;
+    }
+
+
+    .manage-halls-content,
+    .config-hall-content,
+    .config-prices-content,
+    .sessions-content,
+    .open-sale-content {
+        padding-left: 20px !important;
+    }
+
+    .accordion-marker {
+        width: 22px;
+        height: 22px;
+        margin-left: 0;
+    }
+
+
+    /* Если линия — это отдельные элементы */
+    .manage-halls .vertical-line,
+    .config-hall .vertical-line,
+    .config-hall .vertical-line,
+    .config-prices .vertical-line,
+    .sessions-wrapper .vertical-line,
+    .open-sale .vertical-line {
+        display: none !important;
+    }
+
+    /* Если линия рисуется через псевдоэлементы у маркера */
+    .accordion-marker::before,
+    .accordion-marker::after {
+        content: none !important;
+        /* или display:none */
+    }
+
+    /* (опционально) убираем лишний левый “гуттер”, если он был под линию */
+    .config-hall,
+    .manage-halls {
+        padding-left: 0;
+        /* или 10–16px, если нужен небольшой отступ */
+    }
+}
+
+
+
+
+/* Планшет: страница и все секции на всю ширину окна */
+@media (min-width: 768px) and (max-width: 1199px) {
+  html, body {
+    width: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden; /* на случай редких переполнений */
+  }
+
+  .admin-page-wrapper {
+    width: 100%;
+    max-width: none;
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;                /* при желании можно 0 20px */
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;      /* не центрируем детей */
+    box-sizing: border-box;
+  }
+
+  /* каждый дочерний блок на 100% */
+  .admin-page-wrapper > * {
+    width: 100%;
+    max-width: none;
+    margin: 0;
+  }
+
+  /* снять любые фикс-ширины вроде 962px у секций */
+  .manage-halls,
+  .config-hall,
+  .config-prices,
+  .sessions-wrapper,
+  .open-sale,
+  .admin_header,
+  .admin-page-container {
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    box-sizing: border-box;
+  }
+
+  /* выравниваем внутренний контент секций, без левого margin */
+  .manage-halls-content,
+  .config-hall-content,
+  .config-prices-content,
+  .sessions-content,
+  .open-sale-content {
+    margin-left: 0 !important;
+    padding-left: 118px;
+    padding-right: 20px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .sessions-wrapper {
+    width: 962px;     /* если другие секции 962px */
+    margin: 0 auto;   /* по центру контейнера */
+  }
+}

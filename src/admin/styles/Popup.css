@@ -1,0 +1,157 @@
+/* выводим popup */
+
+.popup-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* сам popup */
+.popup {
+  background-color: #B7B7B7;
+  width: 960px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  position: relative;
+  padding: 0px 0px 35px 0px;
+}
+
+/*шапка popup */
+.popup-header {
+  height: 57px;
+  background-color: #63536C;
+  color: #ffffff;
+  padding: 16px 42px 14px 42px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+/*заголовок popup */
+.popup-header h2 {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 114%;
+  text-transform: uppercase;
+  color: #fff;
+}
+
+/*закрывающий крестик */
+.popup-close-btn {
+  background: none;
+  border: none;
+  color: #ffffff;
+  font-size: 40px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+/*организация контента в теле popup */
+.popup-body {
+  padding: 30px 105px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.popup-field {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.popup-field label {
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 117%;
+  color: #848484;
+}
+
+.popup-field input,
+.popup-field textarea,
+.popup-field select {
+  padding: 10px 10px;
+  font-size: 16px;
+  font-weight: 400;
+  color: #757575;
+  border: 1px solid #ccc;
+  border-radius: 2px;
+  width: 100%;
+  box-sizing: border-box;
+  background-color: white;
+  text-transform: uppercase;
+}
+
+.popup-field textarea {
+  resize: vertical;
+  min-height: 70px;
+}
+
+/* футер с кнопками */
+.popup-footer {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 10px;
+  margin-bottom: 16px;
+}
+
+.popup-footer .btn-add,
+.popup-footer .btn-upload {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 114%;
+  text-transform: uppercase;
+  text-align: center;
+  color: #fff;
+  background-color: #16A6AF;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+
+}
+
+.popup-footer .btn-add:hover,
+.popup-footer .btn-upload:hover {
+  background-color: #007f7c;
+}
+
+.popup-footer .btn-cancel {
+  font-weight: 500;
+  font-size: 14px;
+  line-height: 114%;
+  text-transform: uppercase;
+  text-align: center;
+  color: #63536c;
+  background-color: #ffffff;
+  border: 1px solid #574066;
+  padding: 10px 20px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+
+
+}
+
+.popup-footer .btn-cancel:hover {
+  background-color: #eee;
+}
+
+
+
+/* адаптивность */
+@media (max-width: 640px) {
+  .popup {
+    width: 100%;
+  }
+}

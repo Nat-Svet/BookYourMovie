@@ -1,0 +1,126 @@
+/*body {
+  font-family: Arial, sans-serif;
+  background: #f5f5f5;
+  margin: 0;
+  padding: 0;
+}
+/* Фон затемнения */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.3);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+}
+
+/* Окно popup */
+.popup {
+    width: 960px;
+    height: 484px;
+    padding: 0px 0px 35px 0px;
+    background: rgba(234, 233, 235, 0.95);
+
+
+    border-radius: 4px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+/* Заголовок */
+.popup-header {
+    background: #6c5f7b;
+    color: white;
+    font-weight: 700;
+    font-size: 14px;
+    line-height: 16px;
+    padding: 16px 20px;
+    border-top-left-radius: 4px;
+    border-top-right-radius: 4px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.popup-header .close-btn {
+    cursor: pointer;
+    font-weight: 700;
+    font-size: 20px;
+    line-height: 16px;
+    color: white;
+    border: none;
+    background: none;
+}
+
+/* Контент формы */
+.popup-content {
+    padding: 20px 24px 24px 24px;
+}
+
+label {
+    display: block;
+    font-size: 12px;
+    color: #777;
+    margin-bottom: 6px;
+}
+
+input[type="text"],
+textarea {
+    width: 100%;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    font-size: 14px;
+    padding: 6px 10px;
+    box-sizing: border-box;
+    margin-bottom: 20px;
+    font-weight: 500;
+}
+
+input[type="text"]::placeholder,
+textarea::placeholder {
+    font-weight: 400;
+    color: #aaa;
+}
+
+textarea {
+    height: 80px;
+    resize: none;
+}
+
+/* Кнопки внизу */
+.popup-footer {
+    padding: 0 24px 24px 24px;
+    display: flex;
+    gap: 12px;
+}
+
+button {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 14px;
+    padding: 10px 24px;
+    border-radius: 4px;
+    border: none;
+    text-transform: uppercase;
+}
+
+.btn-add {
+    background-color: #1c9aaa;
+    color: white;
+}
+
+.btn-upload {
+    background-color: #1c9aaa;
+    color: white;
+}
+
+.btn-cancel {
+    background-color: #fff;
+    color: #777;
+    border: 1px solid #ccc;
+}

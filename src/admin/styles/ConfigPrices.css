@@ -1,0 +1,228 @@
+.config-prices {
+    width: 962px;
+    background-color: #EAE9EB;
+    opacity: 0.95;
+    position: relative;
+}
+
+
+/* Аккордион импортирован в ManageHalls.jsx, как компонент */
+
+
+
+
+/* ОСНОВНОЕ СОДЕРЖАНИЕ */
+
+.config-prices-content {
+    padding-top: 30px;
+    color: #000000;
+    padding-left: 118px;
+    margin-top: 10px;
+}
+
+
+/* лейбл для выбора зала */
+.config-prices-select {
+    margin-bottom: 40px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 112%;
+}
+
+/* работа с кнопками выбора зала */
+.config-prices-select-buttons {
+    margin-top: 10px;
+    display: flex;
+    gap: 0;
+}
+
+/*обычная кнопка */
+.config-prices-select-btn {
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    padding: 12px 20px 12px 21px;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 114%;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.12), 0 3px 3px 0 rgba(0, 0, 0, 0.24);
+    background: rgba(255, 255, 255, 0.45);
+    color: #000000;
+    margin-left: 0;
+}
+
+
+/*активная кнопка */
+.config-prices-select-btn.active {
+    background-color: #fff;
+    /* белый фон для выбранного */
+    border: 1px solid #999;
+    box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.12), 0 2px 2px 0 rgba(0, 0, 0, 0.24), 0 6px 8px 0 rgba(0, 0, 0, 0.24);
+    /* сильнее тень */
+    color: #000;
+    transform: scale(1.05);
+    /* немного увеличена */
+    padding: 15px 23px 13px 23px;
+    font-weight: 900;
+    font-size: 15px;
+    line-height: 107%;
+    text-transform: uppercase;
+    color: #000;
+}
+
+.config-prices-select-btn:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+
+/* лейбл для блока установки цены */
+.config-prices-instruction {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 112%;
+    color: #000000;
+}
+
+
+/* Установка цены */
+
+.config-prices-input-group {
+    margin-top: 16px;
+    margin-bottom: 16px;
+    max-width: 300px;
+    /* под размер формы */
+}
+
+/*лейбл  для установки цены*/
+.config-prices-input-label {
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 117%;
+    color: #848484;
+    margin-bottom: 2px;
+    display: block;
+}
+
+
+/* работа с рядами ввода */
+.config-prices-input-row {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    /* расстояние между input и текстом */
+}
+
+/* боксы для ввода */
+.config-prices-input-row input {
+    width: 100px;
+    height: 36px;
+    font-size: 14px;
+    border: 1px solid #b7b7b7;
+    padding: 8px 8px 9px 8px;
+    flex-shrink: 0;
+}
+
+/*   описание кресла */
+.config-prices-input-desc {
+    font-size: 14px;
+    font-weight: 400;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    line-height: 114%;
+    color: #848484;
+}
+
+
+.config-prices-inputs input {
+    width: 100px;
+    height: 36px;
+    color: #333;
+    border: 1px solid #b7b7b7;
+    padding: 8px 8px 9px 8px;
+
+}
+
+.config-prices-inputs span {
+    user-select: none;
+}
+
+
+/* цветовые обозначения мест */
+.seat-box {
+    width: 26px;
+    height: 26px;
+    border: 1px solid #393939;
+    border-radius: 4px;
+    display: inline-block;
+    margin: 0 4px;
+    vertical-align: middle;
+}
+
+
+.seat-box.seat-normal {
+    background: #c4c4c4;
+}
+
+.seat-box.seat-vip {
+    background-color: #16a6af;
+}
+
+
+/* работа с кнопками */
+.config-prices-buttons {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 40px;
+    
+}
+
+.btn {
+    padding: 8px 20px;
+    border-radius: 3px !important;
+    border: none;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn-cancel {
+    width: 121px;
+    height: 40px;
+    background-color: #FFFFFF;
+    padding: 11px 31px 11px 31px;
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.12), 0 3px 3px 0 rgba(0, 0, 0, 0.24);
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 114%;
+    text-align: center;
+    color: #63536c;
+}
+
+.btn-cancel:hover {
+    background-color: #ccc;
+}
+
+.btn-save {
+    width: 146px;
+    height: 40px;
+    background-color: #16a6af;
+    color: #FFFFFF;
+    padding: 11px 32px 11px 32px;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 114%;
+    text-transform: uppercase;
+    text-align: center;
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.12), 0 3px 3px 0 rgba(0, 0, 0, 0.24);
+}
+
+.btn-save:hover {
+    background-color: #147474;
+    color: #FFFFFF;
+}

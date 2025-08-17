@@ -1,0 +1,128 @@
+.open-sale {
+    width: 962px;
+    background-color: #EAE9EB;
+    opacity: 0.95;
+    position: relative;
+    /*z-index: 10;*/
+}
+
+
+/* Аккордион импортирован в ManageHalls.jsx, как компонент */
+
+
+
+/* ОСНОВНОЕ СОДЕРЖАНИЕ */
+
+.open-sale-content {
+    padding: 20px;
+    color: #000000;
+    padding-left: 118px;
+
+}
+
+/*лейбл для выбора зала */
+.open-sale-select-label {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 112%;
+    color: #000;
+}
+
+.open-sale-select {
+    margin-bottom: 20px;
+    font-size: 16px;
+    font-weight: 400;
+}
+
+/*работа с кнопками */
+.open-sale-select-buttons {
+    margin-top: 10px;
+    display: flex;
+    gap: 0;
+}
+
+.open-sale-select-btn {
+    width: 81px;
+    height: 42px;
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    padding: 6px 12px;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.12), 0 3px 3px 0 rgba(0, 0, 0, 0.24);
+    background: rgba(255, 255, 255, 0.45);
+    color: #000000;
+
+}
+
+.open-sale-select-btn.active {
+    background-color: #fff;
+    font-weight: 900;
+    /* белый фон для выбранного */
+    border-color: #999;
+    box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.12), 0 2px 2px 0 rgba(0, 0, 0, 0.24), 0 6px 8px 0 rgba(0, 0, 0, 0.24);
+    /* сильнее тень */
+    color: #000;
+    transform: scale(1.05);
+    /* немного увеличена */
+}
+
+.open-sale-select-btn:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+
+/*блок открытия продаж */
+.sale-is-open {
+    display: flex;
+    justify-content: center;
+}
+
+/*лейбл для кнопки открытия продаж */
+.open-sale-instruction {
+    font-size: 16px;
+    font-weight: 400;
+    color: #000000;
+    line-height: 112%;
+    text-align: center;
+}
+
+
+/* работа с кнопкой открытия продаж */
+.button-container {
+    display: flex;
+    justify-content: center;   /* центрирует по горизонтали */
+}
+
+
+.open-sale-final-button {
+    width: 270px;
+    height: 40px;
+    margin-top: 20px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    border-radius: 3px;
+    padding: 11px 31px 11px 31px;
+    border: none;
+    cursor: pointer;
+    user-select: none;
+    background: #16a6af;
+    transition: background-color 0.3s ease;
+    color: white;
+    font-weight: 500;
+    font-size: 14px;
+    line-height: 114%;
+    text-align: center;
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.12), 0 3px 3px 0 rgba(0, 0, 0, 0.24);
+    }
+
+
+.open-sale-final-button:hover {
+    background-color: #147474;
+}

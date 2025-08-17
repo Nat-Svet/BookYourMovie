@@ -1,0 +1,54 @@
+.admin_header {
+    width: 972px;
+    padding-left: 104px;
+    padding-top: 11px;
+    padding-bottom: 0;
+    display: flex;
+    flex-direction: column;
+    }
+
+.admin_header-title {
+    font-size: 34px;
+    color: #FFFFFF;
+    font-weight: 900;
+    line-height: 115%;
+    text-transform: uppercase;
+    margin-bottom: 0;
+}
+
+.admin_header-light {
+    font-weight: 100 !important;
+}
+
+.admin_header-subtitle {
+    font-weight: 400;
+    font-size: 10px;
+    line-height: 120%;
+    letter-spacing: 0.5em;
+    text-transform: uppercase;
+    color: #fff;
+    margin-top: 0;
+}
+
+
+/* Мобильная версия: центрируем AdminHeader */
+
+
+@media (max-width: 767px) {
+    .admin_header {
+        width: 100%; /* вместо 972px */
+        padding-left: 0; /* убираем сдвиг влево */
+        padding-right: 0;
+        padding-top: 16px;
+        margin: 0; /* на всякий случай */
+        display: flex;
+        flex-direction: column;
+        align-items: center; /* центр по горизонтали */
+        text-align: center; /* текст по центру */
+    }
+
+    .admin_header-title,
+    .admin_header-subtitle {
+        text-align: center;
+    }
+}

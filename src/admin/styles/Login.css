@@ -1,0 +1,10 @@
+.login-container {
+   width: 1660px;
+   height: 100vh;
+   display: flex;
+   flex-direction: column;
+   align-items:center;
+   gap: 20px; 
+   
+}
+

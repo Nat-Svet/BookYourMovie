@@ -1,0 +1,317 @@
+.sessions-wrapper {
+  width: 100%;  /* на всю ширину страницы */
+  background-color: #EAE9EB;
+  opacity: 0.95;
+  position: relative;
+}
+
+/* Аккордион импортирован в ManageHalls.jsx, как компонент */
+
+/* ОСНОВНОЕ СОДЕРЖАНИЕ */
+
+/* В один ряд с остальными: на десктопе общий левый отступ 100px */
+.sessions-content {
+  padding: 20px;
+  color: #000;
+  margin-left: 100px;   /* как у других компонентов */
+  padding-left: 0;
+}
+
+/* Планшет/мобильный — без левого отступа */
+@media (max-width: 1199px) {
+  .sessions-content { margin-left: 0; }
+
+  /* Строка зала — якорь для абсолютного позиционирования корзины */
+.hall-schedule {
+  position: relative;
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+/* Корзина не двигает layout: слева, вне потока */
+.schedule-trash {
+  position: absolute;
+  right: 100%;          /* чтобы встать слева от таймлайна */
+  margin-right: 10px;   /* расстояние от края таймлайна */
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  user-select: none;
+  cursor: pointer;
+}
+
+.schedule-trash img { 
+    width: 24px; 
+    height: 24px; 
+}
+
+/* Обёртка таймлайна начинает ровно по левому краю контента */
+.timeline-wrapper {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Сам таймлайн и подписи — на всю доступную ширину обёртки */
+.timeline { 
+    width: 100%; 
+}
+
+/* подписи времени тоже не фиксируем */
+.timeline-times { 
+    width: 100%; 
+}
+}
+
+/* Кнопка */
+.add-movie-btn {
+  border-radius: 3px;
+  padding: 11px 32px;
+  width: 194px;
+  height: 40px;
+  box-shadow: 0 0 3px 0 rgba(0,0,0,0.12), 0 3px 3px 0 rgba(0,0,0,0.24);
+  background: #16a6af;
+  font-weight: 500;
+  font-size: 14px;
+  text-align: center;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  margin-top: 40px;
+  margin-bottom: 10px;
+}
+
+/* Список фильмов */
+.movies-list {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 40px;
+}
+
+/* карточка фильма */
+.movie-card {
+  border: 1px solid rgba(0,0,0,0.3);
+  width: 259px;
+  height: 52px;
+  display: flex;
+  align-items: center;
+  min-width: 150px;
+  position: relative;
+  background: #caff85;
+  box-shadow: 0 0 3px rgba(0,0,0,0.2);
+}
+
+.movie-poster {
+  width: 38px; 
+  object-fit: cover; 
+  margin-right: 8px;
+}
+
+.movie-info { 
+    display: flex; 
+    flex-direction: column; 
+    padding: 0 10px; 
+    width: 221px; 
+    height: 52px; 
+    flex-grow: 1; 
+}
+
+.movie-title { 
+    font-weight: 500; 
+    font-size: 14px; 
+    line-height: 100%; 
+    margin: 5px 0; 
+}
+
+.movie-duration { 
+    font-weight: 400; 
+    font-size: 14px; 
+    line-height: 114%; 
+    color: rgba(0,0,0,0.7); 
+}
+
+/* кнопка удаления карточки фильма */
+.delete-movie-btn {
+  position: absolute; 
+  bottom: 1px; 
+  right: 1px; 
+  border: none; 
+  cursor: pointer;
+  border-radius: 3px; 
+  padding: 4px; 
+  width: 20px; 
+  height: 20px;
+  box-shadow: 0 0 3px 0 rgba(0,0,0,0.12), 0 3px 3px 0 rgba(0,0,0,0.24);
+  background: #fff;
+}
+
+.trash-icon { 
+    width: 12px; 
+    height: 12px; 
+    pointer-events: none; 
+}
+
+
+
+/* drag & drop корзина */
+.schedule-trash {
+  width: 40px; 
+  height: 40px; 
+  margin-right: 10px; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  user-select: none; 
+  cursor: pointer;
+}
+
+.schedule-trash img { 
+    width: 24px; 
+    height: 24px; 
+}
+
+
+
+/* Заголовок зала */
+.hall-name {     
+font-weight: 500;
+font-size: 16px;
+line-height: 112%;
+text-transform: uppercase;
+color: #000;
+}
+
+
+
+/* Обёртка таймлайна */
+.timeline-wrapper { 
+    flex-grow: 1; 
+    min-width: 0; 
+}
+
+/* Таймлайн занимает 100% контейнера */
+.timeline {
+  position: relative;
+  height: 50px;
+  border: 1px solid #848484;
+  background: rgba(234, 233, 235, 0.95);
+  white-space: nowrap;
+  padding-top: 8px;
+  box-sizing: border-box;
+  width: 100%;
+  }
+
+/* Сеанс */
+.session-block {
+  position: absolute;
+  top: 8px;
+  height: 34px;
+  border-radius: 2px;
+  padding: 4px 6px;
+  font-size: 12px;
+  line-height: 1.2;
+  color: #000;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  box-sizing: border-box;
+  cursor: default;
+}
+
+/* Риска */
+.session-tick {
+  position: absolute;
+  bottom: -3px;
+  width: 2px; height: 8px;
+  background-color: #666;
+  border-radius: 1px;
+  pointer-events: none;
+}
+
+/* Подписи времени — тоже 100% ширины, без фиксированных 720px */
+.timeline-times {
+  position: relative;
+  height: 20px;
+  margin-top: 10px;
+  width: 100%;
+}
+
+/* Метки времени */
+.session-time {
+  position: absolute;
+  font-size: 12px;
+  color: #a3a3a3;
+  font-weight: 500;
+  white-space: nowrap;
+  user-select: none;
+  pointer-events: none;
+}
+
+
+
+/* Работа с кнопками */
+.buttons-row { 
+    margin-top: 20px; 
+    display: flex; 
+    justify-content: center; 
+    gap: 12px; 
+    margin-bottom: 20px; 
+}
+
+.btn { 
+    padding: 8px 20px; 
+    border-radius: 6px; 
+    border: none; 
+    font-weight: 700; 
+    cursor: pointer; 
+    user-select: none; 
+    transition: background-color 0.3s ease; 
+}
+
+.cancel-btn { 
+    width: 121px; 
+    height: 40px; 
+    background-color: #fff; 
+    border-radius: 3px; 
+    padding: 11px 31px; 
+    box-shadow: 0 0 3px 0 rgba(0,0,0,0.12), 0 3px 3px 0 rgba(0,0,0,0.24); 
+    font-weight: 500; 
+    font-size: 14px; 
+    text-align: center; 
+    color: #63536c; 
+}
+
+.cancel-btn:hover { 
+    background: #ccc; 
+}
+
+.save-btn { 
+    width: 146px; 
+    height: 40px; 
+    background: #16a6af; 
+    color: #fff; 
+    border-radius: 3px; 
+    padding: 11px 32px; 
+    font-weight: 500; 
+    font-size: 14px; 
+    text-transform: uppercase; 
+    text-align: center; 
+    box-shadow: 0 0 3px 0 rgba(0,0,0,0.12), 0 3px 3px 0 rgba(0,0,0,0.24); 
+}
+
+
+.save-btn:hover { 
+    background: #147474; 
+    color: #FFFFFF;
+}
+
+
+
+
+/* Скрыть вертикальные линии на мобильном  */
+@media (max-width: 767px) {
+  .vertical-line-container, .vertical-line { display: none !important; }
+}

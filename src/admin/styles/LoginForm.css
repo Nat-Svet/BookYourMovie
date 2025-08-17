@@ -1,0 +1,75 @@
+.login-form-container {
+  width: 480px;
+  background-color: #d3d3d3; /* светло-серый фон */
+  padding: 0 0 50px;
+  border-radius: 8px;
+  box-sizing: border-box;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-top: 70px;
+  
+  
+}
+
+.login-form-title {
+  width: 100%;
+  height: 57px;
+  background-color: #63536C; /* цвет шапки */
+  color: white;
+  font-weight: 700;
+  font-size: 22px;
+  padding: 15px 0;
+  margin: -40px -30px 30px;
+  border-radius: 8px 8px 0 0;
+}
+
+.login-form {
+    width: 272px;
+}
+
+.login-label {
+  display: block;
+  text-align: left;
+  font-size: 12px;
+  font-weight: 400;
+  color: #777;
+  user-select: none;
+}
+
+.login-input {
+  width: 100%;
+  height: 36px;
+  padding: 10px 8px;
+  margin-bottom: 10px;
+  border: 1px solid #999;
+  border-radius: 2px;
+  font-size: 16px;
+  font-weight: 400;
+  box-sizing: border-box;
+}
+
+.login-input::placeholder {
+  color: #999;
+}
+
+.login-button {
+  background-color: #16A6AF; /* бирюзовый */
+  color: white;
+  border: none;
+  padding: 12px 0;
+  margin-top: 15px;
+  width: 100%;
+  font-weight: 500;
+  font-size: 14px;
+  border-radius: 4px;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  transition: background-color 0.3s ease;
+  user-select: none;
+}
+
+.login-button:hover {
+  background-color: #147474;
+}

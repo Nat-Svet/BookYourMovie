@@ -1,0 +1,326 @@
+.config-hall {
+    width: 962px;
+    background-color: #EAE9EB;
+    opacity: 0.95;
+    position: relative;
+}
+
+/* Аккордион импортирован в ManageHalls.jsx, как компонент */
+
+
+
+/* ОСНОВНОЕ СОДЕРЖАНИЕ */
+
+.config-hall-content {
+    padding: 20px;
+    color: #000000;
+    padding-left: 118px;
+    margin-top: 20px;
+}
+
+
+/* лейбл для кнопок выбора зала */
+.config-hall-select {
+    margin-bottom: 20px;
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 112%;
+}
+
+
+/* кнопки выбора зала */
+.config-hall-select-buttons {
+    margin-top: 10px;
+    display: flex;
+    gap: 0;
+    
+}
+
+/* обычная кнопка */
+.config-hall-select-btn {
+    border: 1px solid #bbb;
+    border-radius: 3px;
+    padding: 12px 20px 12px 21px;
+    margin-left: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 114%;
+    text-transform: uppercase;
+    transition: background-color 0.3s ease;
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.12), 0 3px 3px 0 rgba(0, 0, 0, 0.24);
+    background: rgba(255, 255, 255, 0.45);
+    color: #000000;
+    margin-left: 0;
+
+}
+
+/*активная кнопка */
+.config-hall-select-btn.active {
+    background-color: #fff;
+    /* белый фон для выбранного */
+    border: 1px solid #999;
+    box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.12), 0 2px 2px 0 rgba(0, 0, 0, 0.24), 0 6px 8px 0 rgba(0, 0, 0, 0.24);
+    /* сильнее тень */
+    color: #000;
+    transform: scale(1.05);
+    /* немного увеличена */
+    padding: 15px 23px 13px 23px;
+    font-weight: 900;
+    font-size: 15px;
+    line-height: 107%;
+    text-transform: uppercase;
+    color: #000;
+}
+
+.config-hall-select-btn:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+
+
+/* инструкция по установке рядов и мест */
+.config-hall-instruction {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 112%;
+    margin-bottom: 8px;
+    color: #000000;
+}
+
+
+/* ввод рядов и мест */
+.config-hall-inputs {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    font-size: 16px;
+    font-weight: 400;
+    color: #757575;
+}
+
+/* ряд - место */
+.config-hall-inputs label {
+    display: flex;
+    flex-direction: column;
+    font-weight: 400;
+    font-size: 12px;
+    line-height: 117%;
+    color: #848484;
+
+}
+
+/* boxes для цифр */
+.config-hall-inputs input {
+    width: 100px;
+    height: 36px;
+    font-size: 16px;
+    font-weight: 400;
+    margin-top: 4px;
+    color: #757575;
+    border: 1px solid #b7b7b7;
+    padding: 8px 8px 9px 8px;
+}
+
+/* x */
+.multiply {
+    margin: 0 8px;
+    font-weight: 400;
+    font-size: 18px;
+    line-height: 117%;
+    color: #848484;
+    user-select: none;
+    margin-top: 20px;
+}
+
+
+
+/* инструкция по типу кресел */
+.config-hall-instruction {
+    font-weight: 400;
+    font-size: 16px;
+    line-height: 112%;
+    color: #000;
+    margin-top: 40px;
+}
+
+
+/* легенда типа кресел */
+.config-hall-legend {
+    font-size: 12px;
+    margin-bottom: 12px;
+    display: flex;
+    gap: 30px;
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 114%;
+    color: #848484;
+
+}
+
+.legend-box {
+    display: inline-block;
+    width: 26px;
+    height: 26px;
+    border-radius: 4px;
+    margin-right: 6px;
+    vertical-align: middle;
+    border: 1px solid transparent;
+
+}
+
+/* Квадраты с цветами согласно макету */
+.legend-box.seat-normal {
+    border: 1px solid #393939;
+    background: #c4c4c4;
+}
+
+
+.legend-box.seat-vip {
+    background: #16a6af;
+    border: 1px solid #0a828a;
+}
+
+.legend-box.seat-blocked {
+    border: 1px solid #c4c4c4;
+}
+
+
+/* подсказка для выбора кресла */
+.config-hall-instruction-hint {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 114%;
+    color: #848484;
+    flex-basis: 100%;
+    font-style: italic;
+    margin-top: 8px;
+    margin-bottom: 10px;
+}
+
+
+
+/* работа с залом */
+
+.config-hall-seats {
+    background-color: #eee;
+    padding: 26px;
+    border: 1px solid #000;
+    user-select: none;
+}
+
+.screen-label {
+    font-size: 16px;
+    font-weight: 400;
+    line-height: 112%;
+    letter-spacing: 0.5em;
+    text-align: center;
+    color: #000;
+    margin-bottom: 26px;
+}
+
+.seats-grid {
+    display: flex;
+    flex-direction: column;
+}
+
+.seat-row {
+    display: flex;
+    justify-content: center;
+}
+
+.seat {
+    width: 26px;
+    height: 26px;
+    border-radius: 4px;
+    cursor: pointer;
+    border: 1px solid #393939;
+    transition: border-color 0.2s ease;
+}
+
+.seat-normal {
+    background-color: #C4C4C4;
+    border: 1px solid #393939;
+}
+
+.seat-vip {
+    background: #16a6af;
+    border: 1px solid #0a828a;
+}
+
+.seat-blocked {
+
+    border: 1px solid #c4c4c4;
+    cursor: not-allowed;
+}
+
+/*.seat:hover:not(.seat-blocked) {
+    border-color: #199399;
+}*/
+
+
+
+/* работа с кнопками */
+
+.config-hall-buttons {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.btn {
+    padding: 8px 20px;
+    border-radius: 3px;
+    border: none;
+    cursor: pointer;
+    user-select: none;
+    transition: background-color 0.3s ease;
+}
+
+.btn-cancel {
+    width: 121px;
+    height: 40px;
+    background-color: #FFFFFF;
+    color: #444;
+    border-radius: 3px;
+    padding: 11px 31px 11px 31px;
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.12), 0 3px 3px 0 rgba(0, 0, 0, 0.24);
+    font-weight: 500 !important;
+    font-size: 14px;
+    line-height: 114%;
+    text-align: center;
+    color: #63536c;
+}
+
+.btn-cancel:hover {
+    background-color: #ccc;
+}
+
+.btn-save {
+    width: 146px;
+    height: 40px;
+    border-radius: 3px;
+    padding: 11px 32px 11px 32px;
+    font-weight: 500 !important;
+    font-size: 14px;
+    line-height: 114%;
+    text-transform: uppercase;
+    text-align: center;
+    color: #fff;
+    box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.12), 0 3px 3px 0 rgba(0, 0, 0, 0.24);
+    background: #16a6af;
+
+}
+
+.btn-save:hover {
+    background-color: #147474;
+}
+
+
+/* вертикальная линия слева */
+.top-part {
+    top: 0;
+    height: 28px; /* от верха блока до верхней границы маркера */
+}

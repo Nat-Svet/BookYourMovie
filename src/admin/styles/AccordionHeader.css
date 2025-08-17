@@ -1,0 +1,56 @@
+/* Хедер аккордеона */
+.accordion-header {
+    width: 100%;
+    height: 95px;
+    background-color: #63536C;
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    user-select: none;
+    cursor: pointer;
+}
+
+/* Круглый маркер слева */
+.accordion-marker {
+    width: 44px;
+    height: 44px;
+    border: 4px solid #BC95D6;
+    background-color: #FFFFFF;
+    border-radius: 50%;
+    margin-right: 24px;
+    margin-left: 28px;
+    box-sizing: border-box;
+    flex-shrink: 0;
+}
+
+/* Заголовок */
+.accordion-title {
+    font-weight: 700;
+    font-size: 22px;
+    flex-grow: 1;
+    line-height: 114%;
+    text-transform: uppercase;
+    color: #fff;
+    margin: 0;
+}
+
+/* Птичка */
+.accordion-toggle-img {
+    width: 24px;
+    height: 16px;
+    margin-left: 0;
+    margin-right: 28px;
+    user-select: none;
+    transition: transform 0.3s ease;
+}
+
+/* переворачиваем птичку вверх */
+.accordion-toggle-img.closed {
+    transform: rotate(180deg);
+}
+
+/* переворачиваем птичку вниз */
+.accordion-toggle-img.open {
+    transform: rotate(0deg);
+}
