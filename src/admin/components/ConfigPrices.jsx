@@ -4,7 +4,7 @@ import '../styles/ConfigPrices.css';
 
 const ConfigPrices = ({ halls }) => {
   const [isOpen, setIsOpen] = useState(true);
-  const [selectedHall, setSelectedHall] = useState(halls.length > 0 ? halls[0].name : '');
+  const [selectedHall, setSelectedHall] = useState(halls.length > 0 ? halls[0].hall_name : '');
   const [normalPrice, setNormalPrice] = useState(0);
   const [vipPrice, setVipPrice] = useState(350);
 
@@ -12,8 +12,8 @@ const ConfigPrices = ({ halls }) => {
 
   // При изменении списка залов сбрасываем selectedHall, если текущий отсутствует
   useEffect(() => {
-    if (!halls.find(h => h.name === selectedHall) && halls.length > 0) {
-      setSelectedHall(halls[0].name);
+    if (!halls.find(h => h.hall_name === selectedHall) && halls.length > 0) {
+      setSelectedHall(halls[0].hall_name);
     }
   }, [halls, selectedHall]);
 
@@ -25,10 +25,10 @@ const ConfigPrices = ({ halls }) => {
         toggleOpen={toggleOpen}
       />
 
-<div className="vertical-line-container">
-    <div className="vertical-line top-part"></div>
-    <div className="vertical-line bottom-part"></div>
-  </div>
+      <div className="vertical-line-container">
+        <div className="vertical-line top-part"></div>
+        <div className="vertical-line bottom-part"></div>
+      </div>
 
       {isOpen && (
         <div className="config-prices-content">
@@ -38,10 +38,10 @@ const ConfigPrices = ({ halls }) => {
               {halls.map(hall => (
                 <button
                   key={hall.id}
-                  className={`config-prices-select-btn ${selectedHall === hall.name ? 'active' : ''}`}
-                  onClick={() => setSelectedHall(hall.name)}
+                  className={`config-prices-select-btn ${selectedHall === hall.hall_name ? 'active' : ''}`}
+                  onClick={() => setSelectedHall(hall.hall_name)}
                 >
-                  {hall.name}
+                  {hall.hall_name}
                 </button>
               ))}
             </div>

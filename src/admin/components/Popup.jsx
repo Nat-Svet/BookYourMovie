@@ -1,17 +1,19 @@
-// components/Popup.jsx
+// src/components/Popup.jsx
 import React from 'react';
+import ReactDOM from 'react-dom';
 import '../styles/Popup.css';
 
 const Popup = ({ visible, title, fields = [], buttons = [], onClose }) => {
   if (!visible) return null;
 
-  return (
+  const popupContent = (
     <div className="popup-overlay" onClick={onClose}>
       <div className="popup" onClick={e => e.stopPropagation()}>
         <div className="popup-header">
           <h2>{title}</h2>
           <button className="popup-close-btn" onClick={onClose}>×</button>
         </div>
+
         <div className="popup-body">
           {fields.map(({ type, label, name, value, placeholder, options, onChange }, idx) => (
             <div className="popup-field" key={idx}>
@@ -42,6 +44,7 @@ const Popup = ({ visible, title, fields = [], buttons = [], onClose }) => {
             </div>
           ))}
         </div>
+
         <div className="popup-footer">
           {buttons.map(({ text, onClick, className, type }, idx) => (
             <button
@@ -57,6 +60,8 @@ const Popup = ({ visible, title, fields = [], buttons = [], onClose }) => {
       </div>
     </div>
   );
+
+  return ReactDOM.createPortal(popupContent, document.getElementById('popup-root'));
 };
 
 export default Popup;

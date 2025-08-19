@@ -47,7 +47,7 @@
     border: 1px solid #bbb;
     border-radius: 3px;
     padding: 6px 12px;
-    margin-left: 10px;
+    margin-left: 0;
     cursor: pointer;
     font-size: 14px;
     font-weight: 500;
@@ -69,6 +69,7 @@
     color: #000;
     transform: scale(1.05);
     /* немного увеличена */
+    margin-left: 0;
 }
 
 .open-sale-select-btn:hover {

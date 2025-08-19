@@ -5,7 +5,7 @@ import '../styles/ConfigHalls.css';
 
 const ConfigHalls = ({ halls }) => {
   const [isOpen, setIsOpen] = useState(true);
-  const [selectedHall, setSelectedHall] = useState(halls.length > 0 ? halls[0].name : '');
+  const [selectedHall, setSelectedHall] = useState(halls.length > 0 ? halls[0].hall_name : '');
   const [rows, setRows] = useState(10);
   const [seatsPerRow, setSeatsPerRow] = useState(8);
   const [seatTypes, setSeatTypes] = useState(
@@ -39,10 +39,9 @@ const ConfigHalls = ({ halls }) => {
     if (value > 0) setSeatsPerRow(value);
   };
 
-  // Обновляем выбранный зал, если зал удалён или список изменился
   useEffect(() => {
-    if (halls.length > 0 && !halls.find(h => h.name === selectedHall)) {
-      setSelectedHall(halls[0].name);
+    if (halls.length > 0 && !halls.find(h => h.hall_name === selectedHall)) {
+      setSelectedHall(halls[0].hall_name);
     }
   }, [halls, selectedHall]);
 
@@ -55,9 +54,9 @@ const ConfigHalls = ({ halls }) => {
       />
 
       <div className="vertical-line-container">
-    <div className="vertical-line top-part"></div>
-    <div className="vertical-line bottom-part"></div>
-  </div>
+        <div className="vertical-line top-part"></div>
+        <div className="vertical-line bottom-part"></div>
+      </div>
 
       {isOpen && (
         <div className="config-hall-content">
@@ -67,10 +66,10 @@ const ConfigHalls = ({ halls }) => {
               {halls.map(hall => (
                 <button
                   key={hall.id}
-                  className={`config-hall-select-btn ${selectedHall === hall.name ? 'active' : ''}`}
-                  onClick={() => setSelectedHall(hall.name)}
+                  className={`config-hall-select-btn ${selectedHall === hall.hall_name ? 'active' : ''}`}
+                  onClick={() => setSelectedHall(hall.hall_name)}
                 >
-                  {hall.name}
+                  {hall.hall_name}
                 </button>
               ))}
             </div>

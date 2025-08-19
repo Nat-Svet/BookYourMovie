@@ -1,3 +1,5 @@
+// [исправленный компонент Sessions]
+
 import React, { useState, useEffect } from 'react';
 import AccordionHeader from './AccordionHeader';
 import poster3 from '../../assets/images/poster3.png';
@@ -14,7 +16,7 @@ const initialMovies = [
   { id: 5, title: 'Кот Да Винчи',  duration: 100, color: '#8599FF', image: poster3 },
 ];
 
-const DAY_MIN = 24 * 60; 
+const DAY_MIN = 24 * 60;
 
 const Sessions = ({ halls }) => {
   const [isOpen, setIsOpen] = useState(true);
@@ -23,29 +25,14 @@ const Sessions = ({ halls }) => {
   const [draggedMovie, setDraggedMovie] = useState(null);
   const [draggedSession, setDraggedSession] = useState(null);
 
-  // Popup для добавления сеанса
-  const [popupData, setPopupData] = useState({
-    visible: false,
-    movieId: null,
-    hall: '',
-    time: '',
-  });
-
-  // Popup для добавления фильма
+  const [popupData, setPopupData] = useState({ visible: false, movieId: null, hall: '', time: '' });
   const [addMoviePopupVisible, setAddMoviePopupVisible] = useState(false);
-  const [newMovieData, setNewMovieData] = useState({
-    title: '',
-    duration: '',
-    description: '',
-    country: '',
-    color: '#ffffff',
-  });
+  const [newMovieData, setNewMovieData] = useState({ title: '', duration: '', description: '', country: '', color: '#ffffff' });
 
-  // Инициализируем halls в sessions
   useEffect(() => {
     setSessions(prev => {
       const next = {};
-      halls.forEach(({ name }) => { next[name] = prev[name] || []; });
+      halls.forEach(({ hall_name }) => { next[hall_name] = prev[hall_name] || []; });
       return next;
     });
   }, [halls]);
@@ -62,14 +49,12 @@ const Sessions = ({ halls }) => {
   };
 
   const onDragStart = (movie) => setDraggedMovie(movie);
-
   const onDrop = (hall) => {
     if (!draggedMovie) return;
     setPopupData({ visible: true, movieId: draggedMovie.id, hall, time: '' });
     setDraggedMovie(null);
   };
 
-  // drag & drop удаления сеанса
   const onSessionDragStart = (hall, idx) => (e) => {
     setDraggedSession({ hall, idx });
     e.dataTransfer.effectAllowed = 'move';
@@ -130,7 +115,6 @@ const Sessions = ({ halls }) => {
         toggleOpen={toggleOpen}
       />
 
-      {/* вертикальная линия */}
       <div className="vertical-line-container">
         <div className="vertical-line top-part"></div>
         <div className="vertical-line bottom-part"></div>
@@ -165,33 +149,17 @@ const Sessions = ({ halls }) => {
             ))}
           </div>
 
-          {halls.map(({ name }) => {
-            const shows = sessions[name] || [];
+          {halls.map(({ hall_name }) => {
+            const shows = sessions[hall_name] || [];
 
             return (
-              <div
-                key={name}
-                className="hall-schedule"
-                style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}
-              >
-                {/* Корзина удаления */}
-                <div
-                  className="schedule-trash"
-                  onDragOver={onTrashDragOver}
-                  onDrop={onTrashDrop}
-                  title="Перетащите сюда сеанс для удаления"
-                  style={{ visibility: draggedSession?.hall === name ? 'visible' : 'hidden' }}
-                >
+              <div key={hall_name} className="hall-schedule" style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
+                <div className="schedule-trash" onDragOver={onTrashDragOver} onDrop={onTrashDrop} title="Перетащите сюда сеанс для удаления" style={{ visibility: draggedSession?.hall === hall_name ? 'visible' : 'hidden' }}>
                   <img src={trash} alt="Удалить сеанс" />
                 </div>
 
-                {/* Таймлайн в процентах (не вылезет за 100% ширины) */}
-                <div
-                  className="timeline-wrapper"
-                  onDragOver={e => e.preventDefault()}
-                  onDrop={() => onDrop(name)}
-                >
-                  <div className="hall-name">{name}</div>
+                <div className="timeline-wrapper" onDragOver={e => e.preventDefault()} onDrop={() => onDrop(hall_name)}>
+                  <div className="hall-name">{hall_name}</div>
 
                   <div className="timeline">
                     {shows.map(({ movieId, start }, idx) => {
@@ -206,13 +174,13 @@ const Sessions = ({ halls }) => {
                       if (leftPct > 100) return null;
 
                       return (
-                        <React.Fragment key={`${name}-${idx}`}>
+                        <React.Fragment key={`${hall_name}-${idx}`}>
                           <div
                             className="session-block"
                             title={`${movie.title} — ${start}`}
                             style={{ left: `${leftPct}%`, width: `${widthPct}%`, backgroundColor: movie.color }}
                             draggable
-                            onDragStart={onSessionDragStart(name, idx)}
+                            onDragStart={onSessionDragStart(hall_name, idx)}
                             onDragEnd={onSessionDragEnd}
                           >
                             {movie.title}
@@ -229,13 +197,7 @@ const Sessions = ({ halls }) => {
                       const leftPct = ((hours * 60 + minutes) / DAY_MIN) * 100;
                       if (leftPct > 100) return null;
                       return (
-                        <div
-                          key={`${name}-t-${idx}`}
-                          className="session-time"
-                          style={{ left: `${leftPct}%` }}
-                        >
-                          {start}
-                        </div>
+                        <div key={`${hall_name}-t-${idx}`} className="session-time" style={{ left: `${leftPct}%` }}>{start}</div>
                       );
                     })}
                   </div>
@@ -251,7 +213,6 @@ const Sessions = ({ halls }) => {
         </div>
       )}
 
-      {/* Popup добавления сеанса */}
       <Popup
         visible={popupData.visible}
         title="ДОБАВЛЕНИЕ СЕАНСА"
@@ -261,7 +222,7 @@ const Sessions = ({ halls }) => {
             label: 'Название зала',
             name: 'hall',
             value: popupData.hall,
-            options: halls.map(h => ({ value: h.name, label: h.name })),
+            options: halls.map(h => ({ value: h.hall_name, label: h.hall_name })),
             onChange: e => setPopupData(prev => ({ ...prev, hall: e.target.value })),
           },
           {
@@ -287,47 +248,15 @@ const Sessions = ({ halls }) => {
         onClose={onPopupClose}
       />
 
-      {/* Popup добавления фильма */}
       <Popup
         visible={addMoviePopupVisible}
         title="ДОБАВЛЕНИЕ ФИЛЬМА"
         fields={[
-          {
-            type: 'text',
-            label: 'Название фильма',
-            name: 'title',
-            value: newMovieData.title,
-            placeholder: 'Например, «Гражданин Кейн»',
-            onChange: e => handleAddMovieChange('title', e.target.value),
-          },
-          {
-            type: 'text',
-            label: 'Продолжительность фильма (мин.)',
-            name: 'duration',
-            value: newMovieData.duration,
-            onChange: e => handleAddMovieChange('duration', e.target.value),
-          },
-          {
-            type: 'textarea',
-            label: 'Описание фильма',
-            name: 'description',
-            value: newMovieData.description,
-            onChange: e => handleAddMovieChange('description', e.target.value),
-          },
-          {
-            type: 'text',
-            label: 'Страна',
-            name: 'country',
-            value: newMovieData.country,
-            onChange: e => handleAddMovieChange('country', e.target.value),
-          },
-          {
-            type: 'color',
-            label: 'Цвет для отображения',
-            name: 'color',
-            value: newMovieData.color,
-            onChange: e => handleAddMovieChange('color', e.target.value),
-          },
+          { type: 'text', label: 'Название фильма', name: 'title', value: newMovieData.title, placeholder: 'Например, «Гражданин Кейн»', onChange: e => handleAddMovieChange('title', e.target.value) },
+          { type: 'text', label: 'Продолжительность фильма (мин.)', name: 'duration', value: newMovieData.duration, onChange: e => handleAddMovieChange('duration', e.target.value) },
+          { type: 'textarea', label: 'Описание фильма', name: 'description', value: newMovieData.description, onChange: e => handleAddMovieChange('description', e.target.value) },
+          { type: 'text', label: 'Страна', name: 'country', value: newMovieData.country, onChange: e => handleAddMovieChange('country', e.target.value) },
+          { type: 'color', label: 'Цвет для отображения', name: 'color', value: newMovieData.color, onChange: e => handleAddMovieChange('color', e.target.value) },
         ]}
         buttons={[
           { text: 'Добавить фильм', onClick: handleAddMovieSubmit, className: 'btn-add' },

@@ -10,12 +10,10 @@ const ManageHalls = ({ halls, addHall, deleteHall }) => {
   const [newHallName, setNewHallName] = useState('');
 
   const toggleOpen = () => setIsOpen(!isOpen);
-
   const openPopup = () => {
     setNewHallName('');
     setPopupVisible(true);
   };
-
   const closePopup = () => {
     setPopupVisible(false);
     setNewHallName('');
@@ -26,9 +24,12 @@ const ManageHalls = ({ halls, addHall, deleteHall }) => {
       alert('Введите название зала');
       return;
     }
+    console.log('📩 Нажата кнопка "Добавить зал"', newHallName);
     addHall(newHallName.trim());
     closePopup();
   };
+
+  console.log('🔁 Получено halls:', halls);
 
   return (
     <section className="manage-halls">
@@ -38,25 +39,26 @@ const ManageHalls = ({ halls, addHall, deleteHall }) => {
         toggleOpen={toggleOpen}
       />
 
-<div className="vertical-line"></div>
+      <div className="vertical-line"></div>
 
       {isOpen && (
         <div className="manage-halls-content">
           <p>Доступные залы:</p>
-          <ul className="manage-halls-list">
-            {halls.map(hall => (
-              <li key={hall.id}>
-                — {hall.name}{' '}
-                <button
-                  className="manage-halls-delete"
-                  title="Удалить зал"
-                  onClick={() => deleteHall(hall.id)}
-                >
-                  <img src={trash} alt="Удалить зал" className="trash-icon" />
-                </button>
-              </li>
-            ))}
-          </ul>
+         <ul className="manage-halls-list">
+  {halls.map(hall => (
+    <li key={hall.id}>
+      — {hall.hall_name}{' '}
+      <button
+        className="manage-halls-delete"
+        title="Удалить зал"
+        onClick={() => deleteHall(hall.id)}
+      >
+        <img src={trash} alt="Удалить зал" className="trash-icon" />
+      </button>
+    </li>
+  ))}
+</ul>
+
           <button className="manage-halls-create" onClick={openPopup}>
             СОЗДАТЬ ЗАЛ
           </button>
