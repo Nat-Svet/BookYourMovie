@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from 'react';
+// src/admin/pages/AdminPage.jsx
+import React, { useEffect, useState, useCallback } from 'react';
 import ManageHalls from '../components/ManageHalls';
 import ConfigHalls from '../components/ConfigHalls';
 import ConfigPrices from '../components/ConfigPrices';
@@ -7,72 +8,39 @@ import OpenSale from '../components/OpenSale';
 import AdminLayout from '../components/AdminLayout';
 import AdminHeader from '../components/AdminHeader';
 import '../styles/AdminPage.css';
+import API from '../../api/api';
+
+const api = new API();
 
 const AdminPage = () => {
   const [halls, setHalls] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    fetchHalls();
+  const fetchHalls = useCallback(async () => {
+    try {
+      const data = await api.getAllData(); // ✅ теперь /alldata
+      const hallsList = Array.isArray(data.halls) ? data.halls : Array.isArray(data) ? data : [];
+      const filtered = hallsList.filter(h => h.hall_name && !h.hall_name.startsWith('temp-'));
+      setHalls(filtered);
+    } catch (err) {
+      console.error('❌ Ошибка загрузки залов:', err);
+      alert('Ошибка при загрузке залов: ' + (err?.message || err));
+    } finally {
+      setLoading(false);
+    }
   }, []);
 
-
-
-
-  const fetchHalls = async () => {
-  try {
-    const formData = new FormData();
-    formData.set('hallName', `temp-${Date.now()}`);
-
-    const res = await fetch('https://shfe-diplom.neto-server.ru/hall', {
-      method: 'POST',
-      body: formData,
-    });
-
-    const data = await res.json();
-    console.log('📥 fetchHalls → ответ:', data);
-
-    const hallsList =
-      data.halls ??
-      (data.result && Array.isArray(data.result.halls)
-        ? data.result.halls
-        : []);
-
-    const filtered = hallsList.filter(h => h.hall_name && !h.hall_name.startsWith('temp-'));
-    setHalls(filtered);
-  } catch (err) {
-    console.error('❌ Ошибка загрузки залов:', err);
-  } finally {
-    setLoading(false);
-  }
-};
-
-
-
-
+  useEffect(() => {
+    fetchHalls();
+  }, [fetchHalls]);
 
   const addHall = async (hallName) => {
     try {
-      console.log('📤 addHall вызван с:', hallName);
-      const formData = new FormData();
-      formData.set('hallName', hallName);
-
-      const res = await fetch('https://shfe-diplom.neto-server.ru/hall', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await res.json();
-      console.log('✅ Ответ от API (add):', data);
-
-      if (data.success) {
-        await fetchHalls();
-      } else {
-        alert(data.error || 'Ошибка при добавлении зала');
-      }
+      await api.createHall({ hallName });
+      await fetchHalls(); // ✅ сразу перезагружаем общий список
     } catch (err) {
       console.error('❌ Ошибка при добавлении зала:', err);
-      alert('Ошибка при добавлении зала');
+      alert(err?.message || 'Ошибка при добавлении зала');
     }
   };
 
@@ -81,21 +49,11 @@ const AdminPage = () => {
     if (!confirmDelete) return;
 
     try {
-      const res = await fetch(`https://shfe-diplom.neto-server.ru/hall/${hallId}`, {
-        method: 'DELETE',
-      });
-
-      const data = await res.json();
-      console.log('🗑 Ответ от API (delete):', data);
-
-      if (data.success) {
-        await fetchHalls();
-      } else {
-        alert(data.error || 'Ошибка при удалении зала');
-      }
+      await api.deleteHall(hallId);
+      await fetchHalls(); // ✅ сразу перезагружаем общий список
     } catch (err) {
       console.error('❌ Ошибка при удалении зала:', err);
-      alert('Ошибка при удалении зала');
+      alert(err?.message || 'Ошибка при удалении зала');
     }
   };
 
@@ -107,7 +65,11 @@ const AdminPage = () => {
           <p>Загрузка залов...</p>
         ) : (
           <>
-            <ManageHalls halls={halls} addHall={addHall} deleteHall={deleteHall} />
+            <ManageHalls
+              halls={halls}
+              onAddHall={addHall}
+              onDeleteHall={deleteHall}
+            />
             <ConfigHalls halls={halls} />
             <ConfigPrices halls={halls} />
             <Sessions halls={halls} />

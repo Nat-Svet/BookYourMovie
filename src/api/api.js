@@ -1,10 +1,6 @@
 // src/api/api.js
-
 const BASE_URL = "https://shfe-diplom.neto-server.ru";
 
-/**
- * Вспомогательная функция: превращает обычный объект в FormData
- */
 function toFormData(payload = {}) {
   const fd = new FormData();
   Object.entries(payload).forEach(([key, value]) => {
@@ -17,8 +13,8 @@ function toFormData(payload = {}) {
 
 export default class API {
   constructor(baseURL = BASE_URL) {
-    this.baseURL = baseURL.replace(/\/+$/, ""); // убираем лишний /
-    this.token = null; // сюда можно сохранить токен после логина
+    this.baseURL = baseURL.replace(/\/+$/, "");
+    this.token = null;
   }
 
   setToken(token) {
@@ -27,47 +23,44 @@ export default class API {
 
   async request(path, { method = "GET", body } = {}) {
     const url = `${this.baseURL}${path.startsWith("/") ? "" : "/"}${path}`;
-
     const options = { method, headers: {} };
 
     if (method !== "GET" && body) {
       options.body = toFormData(body);
     }
-
-    // если есть токен — добавляем его в заголовок
     if (this.token) {
       options.headers["Authorization"] = `Bearer ${this.token}`;
     }
 
     const response = await fetch(url, options);
-    let data;
 
+    if (!response.ok) {
+      let errorMessage = `HTTP error! status: ${response.status}`;
+      try {
+        const text = await response.text();
+        if (text) errorMessage = text;
+      } catch {}
+      throw new Error(errorMessage);
+    }
+
+    // ответ ожидаем в JSON; если не JSON — бросаем понятную ошибку
     try {
-      data = await response.json();
-    } catch {
-      throw new Error(`Ошибка: сервер вернул не-JSON`);
+      const data = await response.json();
+      if (data && data.success === false) {
+        throw new Error(data.error || "Ошибка запроса");
+      }
+      return data.result !== undefined ? data.result : data;
+    } catch (e) {
+      throw new Error("Не удалось обработать ответ сервера");
     }
-
-    if (data.success === false) {
-      throw new Error(data.error || "Ошибка запроса");
-    }
-
-    return data.result;
   }
 
   // ====== Методы API ======
-
-  /**
-   * Авторизация администратора
-   * POST /login
-   * body: { login, password }
-   */
   login({ login, password }) {
     return this.request("/login", {
       method: "POST",
       body: { login, password },
     }).then((res) => {
-      // если сервер вернёт токен — сохраним
       if (res && res.token) {
         this.setToken(res.token);
         localStorage.setItem("token", res.token);
@@ -76,24 +69,14 @@ export default class API {
     });
   }
 
-  /**
-   * Получение всех данных (залы, фильмы, сеансы)
-   * GET /alldata
-   */
+  // ✅ ВАЖНО: правильный путь
   getAllData() {
     return this.request("/alldata", { method: "GET" });
   }
 
-  /**
-   * Покупка билетов
-   * POST /ticket
-   * body: { sessionId, seats, ... }
-   */
   buyTickets(payload) {
     return this.request("/ticket", { method: "POST", body: payload });
   }
-
-  // ===== Методы для админки =====
 
   createHall(payload) {
     return this.request("/hall", { method: "POST", body: payload });
@@ -121,5 +104,9 @@ export default class API {
 
   deleteSession(sessionId) {
     return this.request(`/session/${sessionId}`, { method: "DELETE" });
+  }
+
+  getHallConfig(hallId) {
+    return this.request(`/hall/${hallId}`, { method: "GET" });
   }
 }

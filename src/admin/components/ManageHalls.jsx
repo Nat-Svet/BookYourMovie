@@ -4,32 +4,32 @@ import AccordionHeader from './AccordionHeader';
 import Popup from './Popup';
 import '../styles/ManageHalls.css';
 
-const ManageHalls = ({ halls, addHall, deleteHall }) => {
+const ManageHalls = ({ halls, onAddHall, onDeleteHall }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [popupVisible, setPopupVisible] = useState(false);
   const [newHallName, setNewHallName] = useState('');
 
   const toggleOpen = () => setIsOpen(!isOpen);
+  
   const openPopup = () => {
     setNewHallName('');
     setPopupVisible(true);
   };
+  
   const closePopup = () => {
     setPopupVisible(false);
     setNewHallName('');
   };
 
   const handleAddHall = () => {
-    if (newHallName.trim() === '') {
-      alert('Введите название зала');
+    const trimmed = newHallName.trim();
+    if (!trimmed || trimmed.length < 2) {
+      alert('Введите корректное название зала (не менее 2 символов)');
       return;
     }
-    console.log('📩 Нажата кнопка "Добавить зал"', newHallName);
-    addHall(newHallName.trim());
+    onAddHall(trimmed);
     closePopup();
   };
-
-  console.log('🔁 Получено halls:', halls);
 
   return (
     <section className="manage-halls">
@@ -44,20 +44,20 @@ const ManageHalls = ({ halls, addHall, deleteHall }) => {
       {isOpen && (
         <div className="manage-halls-content">
           <p>Доступные залы:</p>
-         <ul className="manage-halls-list">
-  {halls.map(hall => (
-    <li key={hall.id}>
-      — {hall.hall_name}{' '}
-      <button
-        className="manage-halls-delete"
-        title="Удалить зал"
-        onClick={() => deleteHall(hall.id)}
-      >
-        <img src={trash} alt="Удалить зал" className="trash-icon" />
-      </button>
-    </li>
-  ))}
-</ul>
+          <ul className="manage-halls-list">
+            {halls.map(hall => (
+              <li key={hall.id}>
+                — {hall.hall_name}{' '}
+                <button
+                  className="manage-halls-delete"
+                  title="Удалить зал"
+                  onClick={() => onDeleteHall(hall.id)}
+                >
+                  <img src={trash} alt="Удалить зал" className="trash-icon" />
+                </button>
+              </li>
+            ))}
+          </ul>
 
           <button className="manage-halls-create" onClick={openPopup}>
             СОЗДАТЬ ЗАЛ

@@ -12,12 +12,10 @@ import AdminPage from "./admin/pages/AdminPage";
 const App = () => {
   return (
     <Routes>
-      {/* Админские маршруты */}
+      <Route path="/" element={<AdminPage />} /> {/* ← 👈 добавлено */}
       <Route path="/admin/*" element={<AdminRoutes />} />
       <Route path="/admin/login" element={<Login />} />
       <Route path="/admin/page" element={<AdminPage />} />
-
-      {/* Клиентские маршруты */}
       <Route path="/select" element={<SeatSelection />} />
       <Route path="/movies" element={<MovieList />} />
       <Route path="/payment" element={<Payment />} />
