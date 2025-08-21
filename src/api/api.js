@@ -116,8 +116,8 @@ export default class API {
 
   // Обновление цен в зале
   updatePrices(hallId, payload) {
-    return this.request(`/hall/${hallId}/price`, { method: "POST", body: payload });
-  }
+  return this.request(`/price/${hallId}`, { method: "POST", body: payload });
+}
 
   // Создание фильма
   createMovie(payload) {
