@@ -45,8 +45,8 @@ const OpenSale = ({ halls }) => {
         [selectedHall]: newState
       }));
 
-      alert(newState 
-        ? `Зал «${hall.hall_name}» теперь ОТКРЫТ для продаж` 
+      alert(newState
+        ? `Зал «${hall.hall_name}» теперь ОТКРЫТ для продаж`
         : `Зал «${hall.hall_name}» теперь ЗАКРЫТ для продаж`);
     } catch (e) {
       console.error('Ошибка при изменении статуса:', e);
@@ -59,7 +59,7 @@ const OpenSale = ({ halls }) => {
   return (
     <section className="open-sale">
       <AccordionHeader
-        title="УПРАВЛЕНИЕ ПРОДАЖАМИ"
+        title="ОТКРЫТЬ ПРОДАЖИ"
         isOpen={isOpen}
         toggleOpen={toggleOpen}
       />
@@ -73,7 +73,7 @@ const OpenSale = ({ halls }) => {
         <div className="open-sale-content">
           <div className="open-sale-select">
             <span className="open-sale-select-label">
-              Выберите зал для управления продажами:
+              Выберите зал для открытия/закрытия продаж:
             </span>
             <div className="open-sale-select-buttons">
               {halls.map(hall => (
@@ -88,16 +88,25 @@ const OpenSale = ({ halls }) => {
             </div>
           </div>
 
+
+          <div className="finalDeclaration">
+            <span className="finalDeclaration_text">
+              Все готово к открытию
+            </span>
+          </div>
+
+
+
           <div className="button-container">
             <button
               className="open-sale-final-button"
               onClick={handleToggleSale}
               disabled={isLoading || !selectedHall}
             >
-              {isLoading 
-                ? 'ОБРАБОТКА...' 
-                : getHallSaleState(selectedHall) 
-                  ? 'ЗАКРЫТЬ ПРОДАЖУ БИЛЕТОВ' 
+              {isLoading
+                ? 'ОБРАБОТКА...'
+                : getHallSaleState(selectedHall)
+                  ? 'ЗАКРЫТЬ ПРОДАЖУ БИЛЕТОВ'
                   : 'ОТКРЫТЬ ПРОДАЖУ БИЛЕТОВ'}
             </button>
           </div>

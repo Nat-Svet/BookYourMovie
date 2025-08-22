@@ -17,7 +17,7 @@
     padding: 20px;
     color: #000000;
     padding-left: 118px;
-
+    margin-top: 20px;
 }
 
 /*лейбл для выбора зала */
@@ -32,11 +32,13 @@
     margin-bottom: 20px;
     font-size: 16px;
     font-weight: 400;
+    
 }
 
 /*работа с кнопками */
 .open-sale-select-buttons {
-    margin-top: 10px;
+    margin-top: 30px;
+    margin-bottom: 50px;
     display: flex;
     gap: 0;
 }
@@ -84,7 +86,7 @@
 }
 
 /*лейбл для кнопки открытия продаж */
-.open-sale-instruction {
+.finalDeclaration {
     font-size: 16px;
     font-weight: 400;
     color: #000000;
@@ -97,6 +99,7 @@
 .button-container {
     display: flex;
     justify-content: center;   /* центрирует по горизонтали */
+    margin-top: 20px;
 }
 
 
