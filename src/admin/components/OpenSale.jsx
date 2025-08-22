@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import AccordionHeader from './AccordionHeader';
-import API from '../../api/api'; // путь к вашему api.js
+import API from '../../api/api';
 import '../styles/OpenSale.css';
 
 const OpenSale = ({ halls }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [selectedHall, setSelectedHall] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [hallStates, setHallStates] = useState({}); // Состояние продаж для каждого зала
 
   const toggleOpen = () => setIsOpen(!isOpen);
 
@@ -16,6 +17,11 @@ const OpenSale = ({ halls }) => {
       setSelectedHall(halls[0].hall_name);
     }
   }, [halls]);
+
+  // Функция для получения текущего состояния продаж зала
+  const getHallSaleState = (hallName) => {
+    return hallStates[hallName] || false;
+  };
 
   const handleToggleSale = async () => {
     try {
@@ -27,10 +33,21 @@ const OpenSale = ({ halls }) => {
       const hall = halls.find(h => h.hall_name === selectedHall);
       if (!hall) throw new Error('Зал не найден');
 
-      // Открытие продаж
-      const updatedHall = await api.toggleHallOpen(hall.id, 1);
+      const currentState = getHallSaleState(selectedHall);
+      const newState = !currentState;
 
-      alert(`Зал «${hall.hall_name}» теперь ОТКРЫТ для продаж`);
+      // Обновление состояния продаж
+      const updatedHall = await api.toggleHallOpen(hall.id, newState ? 1 : 0);
+
+      // Обновляем состояние для этого зала
+      setHallStates(prev => ({
+        ...prev,
+        [selectedHall]: newState
+      }));
+
+      alert(newState 
+        ? `Зал «${hall.hall_name}» теперь ОТКРЫТ для продаж` 
+        : `Зал «${hall.hall_name}» теперь ЗАКРЫТ для продаж`);
     } catch (e) {
       console.error('Ошибка при изменении статуса:', e);
       alert('Не удалось изменить статус продаж: ' + e.message);
@@ -42,7 +59,7 @@ const OpenSale = ({ halls }) => {
   return (
     <section className="open-sale">
       <AccordionHeader
-        title="ОТКРЫТЬ ПРОДАЖИ"
+        title="УПРАВЛЕНИЕ ПРОДАЖАМИ"
         isOpen={isOpen}
         toggleOpen={toggleOpen}
       />
@@ -56,7 +73,7 @@ const OpenSale = ({ halls }) => {
         <div className="open-sale-content">
           <div className="open-sale-select">
             <span className="open-sale-select-label">
-              Выберите зал для открытия продаж:
+              Выберите зал для управления продажами:
             </span>
             <div className="open-sale-select-buttons">
               {halls.map(hall => (
@@ -77,7 +94,11 @@ const OpenSale = ({ halls }) => {
               onClick={handleToggleSale}
               disabled={isLoading || !selectedHall}
             >
-              {isLoading ? 'ОБРАБОТКА...' : 'ОТКРЫТЬ ПРОДАЖУ БИЛЕТОВ'}
+              {isLoading 
+                ? 'ОБРАБОТКА...' 
+                : getHallSaleState(selectedHall) 
+                  ? 'ЗАКРЫТЬ ПРОДАЖУ БИЛЕТОВ' 
+                  : 'ОТКРЫТЬ ПРОДАЖУ БИЛЕТОВ'}
             </button>
           </div>
         </div>
