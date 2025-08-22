@@ -319,6 +319,54 @@ const Sessions = ({ halls }) => {
 
   const onPopupClose = () => setPopupData({ visible: false, movieId: null, hall: '', time: '' });
 
+  const handleCancel = async () => {
+  if (isLoading) return;
+  try {
+    setIsLoading(true);
+    // Перечитываем данные с сервера
+    await loadAllData();
+
+    // Закрываем попапы и чистим временные стейты
+    setPopupData({ visible: false, movieId: null, hall: '', time: '' });
+    setAddMoviePopupVisible(false);
+    setNewMovieData({
+      title: '',
+      duration: '',
+      description: '',
+      country: '',
+      color: '#ffffff',
+      posterFile: null
+    });
+  } catch (error) {
+    console.error('Ошибка при отмене:', error);
+    alert('Не удалось отменить изменения: ' + error.message);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+
+  // Добавьте это рядом с другими хендлерами, перед // --- render ---
+const handleSave = async () => {
+  if (isLoading) return;
+  try {
+    setIsLoading(true);
+    // Если нет черновиков — просто синхронизируемся с сервером
+    await reloadSessions();
+    alert('Изменения сохранены.');
+  } catch (e) {
+    console.error('Ошибка при сохранении:', e);
+    alert('Не удалось сохранить изменения: ' + e.message);
+  } finally {
+    setIsLoading(false);
+  }
+};
+
+
+
+  
+
+
   // --- render ---
 
   return (
@@ -453,12 +501,21 @@ const Sessions = ({ halls }) => {
           })}
 
           <div className="buttons-row">
-            <button className="btn cancel-btn" disabled={isLoading}>
+            <button
+              className="btn cancel-btn"
+              onClick={handleCancel}
+              disabled={isLoading}
+            >
               ОТМЕНА
             </button>
-            <button className="btn save-btn" disabled={isLoading}>
-              {isLoading ? 'СОХРАНЕНИЕ...' : 'СОХРАНИТЬ'}
-            </button>
+            <button
+  className="btn save-btn"
+  onClick={handleSave}
+  disabled={isLoading}
+>
+  {isLoading ? 'СОХРАНЕНИЕ...' : 'СОХРАНИТЬ'}
+</button>
+
           </div>
         </div>
       )}
