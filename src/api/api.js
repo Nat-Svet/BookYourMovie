@@ -1,5 +1,3 @@
-// src/api/api.js
-
 const BASE_URL = "https://shfe-diplom.neto-server.ru";
 
 function toFormData(payload = {}) {
@@ -51,7 +49,7 @@ export default class API {
         try {
           const text = await response.text();
           if (text) errorMessage = text;
-        } catch {}
+        } catch { }
         throw new Error(errorMessage);
       }
 
@@ -78,6 +76,7 @@ export default class API {
   }
 
   // ==== Методы API ====
+
   login({ login, password }) {
     return this.request("/login", {
       method: "POST",
@@ -126,7 +125,6 @@ export default class API {
     return this.request("/seance", { method: "POST", body: payload });
   }
 
-  // Исправленный метод deleteSession
   deleteSession(sessionId) {
     return this.request(`/seance/${sessionId}`, {
       method: "DELETE"
@@ -135,5 +133,12 @@ export default class API {
 
   getHallConfig(hallId) {
     return this.request(`/hall/${hallId}`, { method: "GET" });
+  }
+
+  toggleHallOpen(hallId, isOpen) {
+    return this.request(`/open/${hallId}`, {
+      method: "POST",
+      body: { hallOpen: isOpen ? 1 : 0 },
+    });
   }
 }

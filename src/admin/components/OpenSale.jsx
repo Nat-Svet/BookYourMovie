@@ -1,18 +1,43 @@
 import React, { useState, useEffect } from 'react';
 import AccordionHeader from './AccordionHeader';
+import API from '../../api/api'; // путь к вашему api.js
 import '../styles/OpenSale.css';
 
 const OpenSale = ({ halls }) => {
   const [isOpen, setIsOpen] = useState(true);
-  const [selectedHall, setSelectedHall] = useState(halls.length > 0 ? halls[0].hall_name : '');
+  const [selectedHall, setSelectedHall] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
 
   const toggleOpen = () => setIsOpen(!isOpen);
 
+  // Установить первый зал при загрузке/изменении
   useEffect(() => {
-    if (!halls.find(h => h.hall_name === selectedHall) && halls.length > 0) {
+    if (halls.length > 0) {
       setSelectedHall(halls[0].hall_name);
     }
-  }, [halls, selectedHall]);
+  }, [halls]);
+
+  const handleToggleSale = async () => {
+    try {
+      setIsLoading(true);
+      const api = new API();
+      const token = localStorage.getItem('token');
+      if (token) api.setToken(token);
+
+      const hall = halls.find(h => h.hall_name === selectedHall);
+      if (!hall) throw new Error('Зал не найден');
+
+      // Открытие продаж
+      const updatedHall = await api.toggleHallOpen(hall.id, 1);
+
+      alert(`Зал «${hall.hall_name}» теперь ОТКРЫТ для продаж`);
+    } catch (e) {
+      console.error('Ошибка при изменении статуса:', e);
+      alert('Не удалось изменить статус продаж: ' + e.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <section className="open-sale">
@@ -30,7 +55,9 @@ const OpenSale = ({ halls }) => {
       {isOpen && (
         <div className="open-sale-content">
           <div className="open-sale-select">
-            <span className="open-sale-select-label">Выберите зал для открытия/закрытия продаж:</span>
+            <span className="open-sale-select-label">
+              Выберите зал для открытия продаж:
+            </span>
             <div className="open-sale-select-buttons">
               {halls.map(hall => (
                 <button
@@ -45,7 +72,13 @@ const OpenSale = ({ halls }) => {
           </div>
 
           <div className="button-container">
-            <button className="open-sale-final-button">ОТКРЫТЬ ПРОДАЖУ БИЛЕТОВ</button>
+            <button
+              className="open-sale-final-button"
+              onClick={handleToggleSale}
+              disabled={isLoading || !selectedHall}
+            >
+              {isLoading ? 'ОБРАБОТКА...' : 'ОТКРЫТЬ ПРОДАЖУ БИЛЕТОВ'}
+            </button>
           </div>
         </div>
       )}
