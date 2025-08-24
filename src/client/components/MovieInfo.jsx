@@ -2,19 +2,20 @@ import React from "react";
 import Tooltip from './Tooltip';
 import "../styles/MovieInfo.css";
 
-export default function MovieInfo() {
+export default function MovieInfo({ filmName, sessionTime, hallName }) {
   return (
     <div className="movie-info">
       <div className="movie-info__content">
         <div className="movie-info__title">
-          Звёздные войны XXIII: Атака клонированных клонов
+          {filmName || "Фильм не выбран"}
         </div>
         <div className="movie-info__session">
-          Начало сеанса: 18:30
+          Начало сеанса: {sessionTime || "--:--"}
         </div>
         <div className="movie-info__hall">
-          Зал 1
-        </div>
+  {hallName || "Зал не выбран"}
+</div>
+
       </div>
       <div className="movie-info__tooltip">
         <Tooltip />
@@ -22,3 +23,4 @@ export default function MovieInfo() {
     </div>
   );
 }
+

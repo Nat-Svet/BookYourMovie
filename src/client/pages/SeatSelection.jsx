@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
 import Layout from "../components/Layout";
 import ClientHeader from "../components/ClientHeader";
 import MovieInfo from "../components/MovieInfo";
@@ -7,24 +8,42 @@ import Button from "../components/Button";
 import "../styles/SeatSelection.css";
 
 export default function SeatSelection() {
+  const location = useLocation();
+  const params = useParams();
+
+  // Сохраняем параметры в локальное состояние
+  const [seanceData, setSeanceData] = useState({
+    filmName: null,
+    sessionTime: null,
+    hallName: null,
+  });
+
+  useEffect(() => {
+    if (location.state) {
+      const { filmName, sessionTime, hallName } = location.state;
+      setSeanceData({ filmName, sessionTime, hallName });
+    }
+  }, [location.state]);
+
   return (
     <Layout>
       <div className="seat-selection-page">
-        <div class="client-header">
+        <div className="client-header">
           <ClientHeader />
         </div>
-        <main className="content"> {/* состоит из трех рядов */}
-          {/* Первый ряд — MovieInfo */}
+        <main className="content">
           <div className="movie-info-row">
-            <MovieInfo />
+            <MovieInfo
+              filmName={seanceData.filmName}
+              sessionTime={seanceData.sessionTime}
+              hallName={seanceData.hallName}
+            />
           </div>
 
-          {/* Второй ряд — CinemaHall */}
           <div className="cinema-hall-row">
-            <CinemaHall />
+            <CinemaHall seanceId={params.seanceId} />
           </div>
 
-          {/* Третий ряд — Button */}
           <div className="button-row">
             <Button>Забронировать</Button>
           </div>
