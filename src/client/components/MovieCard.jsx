@@ -1,7 +1,21 @@
 import React from "react";
 import "../styles/MovieCard.css";
 
-const MovieCard = ({ title, description, durationCountry, imageSrc, halls }) => {
+const MovieCard = ({ 
+  title, 
+  description, 
+  durationCountry, 
+  imageSrc, 
+  halls,
+  onTimeClick,
+  selectedDate 
+}) => {
+  const handleTimeClick = (seanceId, time) => {
+    if (onTimeClick) {
+      onTimeClick(seanceId, time, selectedDate);
+    }
+  };
+
   return (
     <article className="mc">
       <div className="mc__top">
@@ -18,17 +32,18 @@ const MovieCard = ({ title, description, durationCountry, imageSrc, halls }) => 
         </div>
       </div>
 
-      {halls.map(({ name, times }) => (
+      {halls && halls.map(({ name, seances }) => (
         <section className="mc__hall" key={name} aria-labelledby={`hall-${name}`}>
           <h4 className="mc__hall-title" id={`hall-${name}`}>{name}</h4>
           <div className="mc__times" role="list">
-            {times.map((time) => (
+            {seances && seances.map(({ time, id }) => (
               <button
-                key={time}
+                key={id}
                 type="button"
                 className="mc__time"
                 role="listitem"
                 aria-label={`Сеанс в ${time} в ${name}`}
+                onClick={() => handleTimeClick(id, time)}
               >
                 {time}
               </button>

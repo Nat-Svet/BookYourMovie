@@ -1,79 +1,158 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import ClientHeader from '../components/ClientHeader';
 import MovieCard from '../components/MovieCard';
 import Button from '../components/Button';
 import Layout from '../components/Layout';
 import DatesNav from '../components/DatesNav';
 import '../styles/MovieList.css';
-
-import poster1 from '../../assets/images/poster1.jpg.png';
-import poster2 from '../../assets/images/poster2.jpg.png';
-
-
-
-const movies = [
-  {
-    title: 'Звёздные войны XXIII: Атака клонированных клонов',
-    description: 'Две сотни лет назад малороссийские хутора разоряла шайка нехристь-ляхов во главе с могущественным колдуном.',
-    durationCountry: '130 минут США',
-    imageSrc: poster1,
-    halls: [
-      { name: 'Зал 1', times: ['10:20', '14:10', '18:40', '22:00'] },
-      { name: 'Зал 2', times: ['11:15', '14:40', '16:00', '18:30', '21:00', '23:30'] },
-    ],
-  },
-  {
-    title: 'Альфа',
-    description: '20 тысяч лет назад Земля была холодным и неуютным местом, в котором смерть подстерегала человека на каждом шагу.',
-    durationCountry: '96 минут Франция',
-    imageSrc: poster2,
-    halls: [
-      { name: 'Зал 1', times: ['10:20', '14:10', '18:40', '22:00'] },
-      { name: 'Зал 2', times: ['11:15', '14:40', '16:00', '18:30', '21:00', '23:30'] },
-    ],
-  },
-  {
-    title: 'Хищник',
-    description: 'Самые опасные хищники Вселенной, прибыв из глубин космоса, высаживаются на улицах маленького городка...',
-    durationCountry: '101 минута Канада, США',
-    imageSrc: poster2,
-    halls: [
-      { name: 'Зал 1', times: ['09:00', '10:10', '12:55', '14:15', '14:50', '16:30', '18:00', '18:50', '19:50', '20:55', '22:00'] },
-    ],
-  },
-];
+import API from '../../api/api';
 
 const MovieList = () => {
+  const [movies, setMovies] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [selectedDate, setSelectedDate] = useState(
+    new Date().toISOString().split('T')[0]
+  );
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        setLoading(true);
+        const api = new API();
+        const data = await api.getAllData();
+        
+        const transformedMovies = transformApiData(data);
+        setMovies(transformedMovies);
+      } catch (err) {
+        setError(err.message);
+        console.error('Ошибка при загрузке данных:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const transformApiData = (apiData) => {
+    if (!apiData || !apiData.films || !apiData.halls || !apiData.seances) {
+      return [];
+    }
+    
+    const { films, halls, seances } = apiData;
+    
+    return films.map(film => {
+      const filmSeances = seances.filter(seance => seance.seance_filmid === film.id);
+      
+      const hallsWithSeances = halls
+        .filter(hall => filmSeances.some(seance => seance.seance_hallid === hall.id))
+        .map(hall => {
+          const seancesForHall = filmSeances
+            .filter(seance => seance.seance_hallid === hall.id)
+            .map(seance => ({
+              time: seance.seance_time,
+              id: seance.id
+            }));
+          
+          return {
+            name: hall.hall_name,
+            seances: seancesForHall
+          };
+        });
+      
+      return {
+        id: film.id,
+        title: film.film_name,
+        description: film.film_origin ? `${film.film_duration} минут, ${film.film_origin}` : `${film.film_duration} минут`,
+        durationCountry: film.film_origin ? `${film.film_duration} минут ${film.film_origin}` : `${film.film_duration} минут`,
+        imageSrc: film.film_poster,
+        halls: hallsWithSeances
+      };
+    });
+  };
+
+  const handleDateChange = (newDate) => {
+    setSelectedDate(newDate);
+  };
+
+  const handleTimeClick = (seanceId, time, date) => {
+    // Переходим на страницу выбора мест
+    navigate(`/booking/${seanceId}`, { 
+      state: { 
+        seanceId, 
+        date, 
+        time 
+      } 
+    });
+  };
+
+  const handleLoginClick = () => {
+  navigate('/admin/login'); // ✅ это ведёт на страницу Login
+};
+
+
+  if (loading) {
+    return (
+      <Layout>
+        <div className="movie-list-container">
+          <div className="movie-list-header">
+            <ClientHeader />
+            <Button onClick={handleLoginClick}>Войти</Button>
+          </div>
+          <div className="loading">Загрузка...</div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="movie-list-container">
+          <div className="movie-list-header">
+            <ClientHeader />
+            <Button onClick={handleLoginClick}>Войти</Button>
+          </div>
+          <div className="error">Ошибка: {error}</div>
+        </div>
+      </Layout>
+    );
+  }
+
   return (
     <Layout>
       <div className="movie-list-container">
         <div className="movie-list-header">
           <ClientHeader />
-          <Button>Войти</Button>
+          <Button onClick={handleLoginClick}>Войти</Button>
         </div>
 
-        <DatesNav />
-
+        <DatesNav onDateChange={handleDateChange} selectedDate={selectedDate} />
 
         <div className="movie-list-movies">
-          {movies.map(movie => (
-            <MovieCard
-              key={movie.title}
-              title={movie.title}
-              description={movie.description}
-              durationCountry={movie.durationCountry}
-              imageSrc={movie.imageSrc}
-              halls={movie.halls}
-            />
-            
-          ))}
-        
+          {movies.length > 0 ? (
+            movies.map(movie => (
+              <MovieCard
+                key={movie.id}
+                title={movie.title}
+                description={movie.description}
+                durationCountry={movie.durationCountry}
+                imageSrc={movie.imageSrc}
+                halls={movie.halls}
+                onTimeClick={handleTimeClick}
+                selectedDate={selectedDate}
+              />
+            ))
+          ) : (
+            <div className="no-movies">Нет доступных фильмов</div>
+          )}
         </div> 
-        </div>        
-      
+      </div>        
     </Layout>
   );
 };
-
 
 export default MovieList;

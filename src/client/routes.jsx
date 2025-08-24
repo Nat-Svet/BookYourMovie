@@ -9,7 +9,7 @@ const ClientRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<MovieList />} />
-      <Route path="/seats" element={<SeatSelection />} />
+      <Route path="/booking/:seanceId" element={<SeatSelection />} />
       <Route path="/payment" element={<Payment />} />
       <Route path="/ticket" element={<Ticket />} />
       <Route path="/*" element={<Navigate to="/" />} />
@@ -18,4 +18,3 @@ const ClientRoutes = () => {
 };
 
 export default ClientRoutes;
-

@@ -75,7 +75,7 @@ export default class API {
     }
   }
 
-  // ==== Методы API ====
+  // ==== Методы API для админской части ====
 
   login({ login, password }) {
     return this.request("/login", {
@@ -92,10 +92,6 @@ export default class API {
 
   getAllData() {
     return this.request("/alldata", { method: "GET" });
-  }
-
-  buyTickets(payload) {
-    return this.request("/ticket", { method: "POST", body: payload });
   }
 
   createHall(payload) {
@@ -139,6 +135,30 @@ export default class API {
     return this.request(`/open/${hallId}`, {
       method: "POST",
       body: { hallOpen: isOpen ? 1 : 0 },
+    });
+  }
+
+  // ==== Методы API для клиентской части ====
+
+  // Получение конфигурации зала для сеанса
+  getSeanceHallConfig(seanceId, date) {
+    const params = new URLSearchParams({
+      seanceId: seanceId.toString(),
+      date: date
+    }).toString();
+    
+    return this.request(`/hallconfig?${params}`, { method: "GET" });
+  }
+
+  // Покупка билетов (клиентская версия)
+  buyTicketsClient(seanceId, ticketDate, tickets) {
+    return this.request("/ticket", {
+      method: "POST",
+      body: {
+        seanceId,
+        ticketDate,
+        tickets: JSON.stringify(tickets)
+      }
     });
   }
 }

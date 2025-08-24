@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/DatesNav.css';
 
 function formatDayName(date) {
@@ -10,56 +10,77 @@ function formatDayNumber(date) {
   return date.getDate();
 }
 
-const DatesNav = ({ onDateChange }) => {
-  const today = new Date();
+function formatDateString(date) {
+  return date.toISOString().split('T')[0];
+}
 
-  const initialDates = Array.from({ length: 6 }, (_, i) => {
-    const date = new Date(today);
-    date.setDate(today.getDate() + i);
-    return {
-      dayName: formatDayName(date),
-      dayNumber: formatDayNumber(date),
-      dateObj: date,
-    };
-  });
-
-  const [dates, setDates] = useState(initialDates);
+const DatesNav = ({ onDateChange, selectedDate: externalSelectedDate }) => {
+  const [dates, setDates] = useState([]);
   const [activeIndex, setActiveIndex] = useState(0);
+
+  useEffect(() => {
+    const today = new Date();
+    const initialDates = Array.from({ length: 6 }, (_, i) => {
+      const date = new Date(today);
+      date.setDate(today.getDate() + i);
+      return {
+        dayName: formatDayName(date),
+        dayNumber: formatDayNumber(date),
+        dateString: formatDateString(date),
+        dateObj: date,
+      };
+    });
+
+    setDates(initialDates);
+    
+    // Устанавливаем активную дату
+    if (externalSelectedDate) {
+      const index = initialDates.findIndex(
+        d => d.dateString === externalSelectedDate
+      );
+      if (index !== -1) {
+        setActiveIndex(index);
+      }
+    }
+  }, [externalSelectedDate]);
 
   const handleDateClick = (index) => {
     setActiveIndex(index);
-    if (onDateChange) onDateChange(dates[index]);
+    if (onDateChange && dates[index]) {
+      onDateChange(dates[index].dateString);
+    }
   };
 
   const handleNextClick = () => {
-    const lastDateObj = dates[dates.length - 1].dateObj;
+    const lastDateObj = new Date(dates[dates.length - 1].dateObj);
     const nextDateObj = new Date(lastDateObj);
-    nextDateObj.setDate(nextDateObj.getDate() + 1);
+    nextDateObj.setDate(lastDateObj.getDate() + 1);
 
     const newDate = {
       dayName: formatDayName(nextDateObj),
       dayNumber: formatDayNumber(nextDateObj),
+      dateString: formatDateString(nextDateObj),
       dateObj: nextDateObj,
     };
 
-    setDates((prev) => {
-      let newDates = [...prev, newDate];
-      if (newDates.length > 6) {
-        newDates = newDates.slice(1);
-      }
+    setDates(prev => {
+      const newDates = [...prev.slice(1), newDate];
       return newDates;
     });
 
-    setActiveIndex(5);
-    if (onDateChange) onDateChange(newDate);
+    // Активный индекс становится последним (новый день)
+    setActiveIndex(dates.length - 1);
+    if (onDateChange) {
+      onDateChange(newDate.dateString);
+    }
   };
 
   return (
     <nav className="dates-nav">
       <ul className="dates-list">
-        {dates.map(({ dayName, dayNumber }, idx) => (
+        {dates.map(({ dayName, dayNumber, dateString }, idx) => (
           <li
-            key={idx}
+            key={dateString}
             className={`date-item ${idx === activeIndex ? 'active' : ''}`}
             tabIndex={0}
             role="button"
@@ -88,5 +109,3 @@ const DatesNav = ({ onDateChange }) => {
 };
 
 export default DatesNav;
-
-
