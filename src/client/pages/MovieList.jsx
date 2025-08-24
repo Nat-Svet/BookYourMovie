@@ -37,42 +37,77 @@ const MovieList = () => {
     fetchData();
   }, []);
 
-  const transformApiData = (apiData) => {
-    if (!apiData || !apiData.films || !apiData.halls || !apiData.seances) {
-      return [];
-    }
-    
-    const { films, halls, seances } = apiData;
-    
-    return films.map(film => {
-      const filmSeances = seances.filter(seance => seance.seance_filmid === film.id);
-      
-      const hallsWithSeances = halls
-        .filter(hall => filmSeances.some(seance => seance.seance_hallid === hall.id))
-        .map(hall => {
-          const seancesForHall = filmSeances
-            .filter(seance => seance.seance_hallid === hall.id)
-            .map(seance => ({
-              time: seance.seance_time,
-              id: seance.id
-            }));
-          
-          return {
-            name: hall.hall_name,
-            seances: seancesForHall
-          };
+
+const isHallOpen = (hall) => {
+  const raw = hall?.hall_open ?? hall?.is_open ?? hall?.open;
+  if (typeof raw === 'boolean') return raw;
+  if (typeof raw === 'number') return raw === 1;
+  if (typeof raw === 'string') return raw === '1' || raw.toLowerCase() === 'true';
+  return false;
+};
+
+const transformApiData = (apiData) => {
+  if (!apiData || !apiData.films || !apiData.halls || !apiData.seances) {
+    return [];
+  }
+
+  const { films, halls, seances } = apiData;
+
+  // Создаем Map по id залов
+  const hallsById = new Map(halls.map(h => [h.id, h]));
+
+  // Фильтруем только сеансы в открытых залах
+  const openSeances = seances.filter(seance => {
+    const hall = hallsById.get(seance.seance_hallid);
+    return hall && isHallOpen(hall);
+  });
+
+  // Строим карту залов с сеансами по фильмам
+  return films
+    .map(film => {
+      const filmSeances = openSeances.filter(s => s.seance_filmid === film.id);
+
+      // группировка по залам
+      const hallsWithSeances = filmSeances.reduce((acc, seance) => {
+        const hall = hallsById.get(seance.seance_hallid);
+        if (!hall) return acc;
+
+        const hallName = hall.hall_name;
+        if (!acc[hallName]) acc[hallName] = [];
+
+        acc[hallName].push({
+          time: seance.seance_time,
+          id: seance.id
         });
-      
+
+        return acc;
+      }, {});
+
+      const hallsArray = Object.entries(hallsWithSeances).map(([name, seances]) => ({
+        name,
+        seances: seances.sort((a, b) => {
+          const [h1, m1] = a.time.split(':').map(Number);
+          const [h2, m2] = b.time.split(':').map(Number);
+          return h1 * 60 + m1 - (h2 * 60 + m2);
+        })
+      }));
+
       return {
         id: film.id,
         title: film.film_name,
-        description: film.film_origin ? `${film.film_duration} минут, ${film.film_origin}` : `${film.film_duration} минут`,
-        durationCountry: film.film_origin ? `${film.film_duration} минут ${film.film_origin}` : `${film.film_duration} минут`,
-        imageSrc: film.film_poster,
-        halls: hallsWithSeances
+        description: film.film_description || '',
+        durationCountry: film.film_origin
+          ? `${film.film_duration} минут · ${film.film_origin}`
+          : `${film.film_duration} минут`,
+        imageSrc: film.film_poster || '/default-poster.png',
+        halls: hallsArray
       };
-    });
-  };
+    })
+    .filter(movie => movie.halls.length > 0);
+};
+
+
+
 
   const handleDateChange = (newDate) => {
     setSelectedDate(newDate);

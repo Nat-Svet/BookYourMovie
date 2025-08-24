@@ -119,6 +119,15 @@
   border-color: #8c6fb1;
 }
 
+.mc__time--disabled {
+  opacity: 0.5;
+  pointer-events: none;
+  cursor: default;
+  background-color: #ccc;
+  color: #666;
+}
+
+
 /* Адаптивность */
 @media (max-width: 575px) {
   .mc__top {

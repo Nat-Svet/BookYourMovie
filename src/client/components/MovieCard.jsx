@@ -32,25 +32,47 @@ const MovieCard = ({
         </div>
       </div>
 
-      {halls && halls.map(({ name, seances }) => (
-        <section className="mc__hall" key={name} aria-labelledby={`hall-${name}`}>
-          <h4 className="mc__hall-title" id={`hall-${name}`}>{name}</h4>
-          <div className="mc__times" role="list">
-            {seances && seances.map(({ time, id }) => (
-              <button
-                key={id}
-                type="button"
-                className="mc__time"
-                role="listitem"
-                aria-label={`Сеанс в ${time} в ${name}`}
-                onClick={() => handleTimeClick(id, time)}
-              >
-                {time}
-              </button>
-            ))}
-          </div>
-        </section>
-      ))}
+      {halls && halls.map(({ name, seances }) => {
+  const sortedSeances = [...seances].sort((a, b) => {
+    const [h1, m1] = a.time.split(':').map(Number);
+    const [h2, m2] = b.time.split(':').map(Number);
+    return h1 * 60 + m1 - (h2 * 60 + m2);
+  });
+
+  return (
+    <section className="mc__hall" key={name} aria-labelledby={`hall-${name}`}>
+      <h4 className="mc__hall-title" id={`hall-${name}`}>{name}</h4>
+      <div className="mc__times" role="list">
+        
+        {sortedSeances.map(({ time, id }) => {
+  const now = new Date();
+  const [hours, minutes] = time.split(':').map(Number);
+  const seanceTime = new Date(selectedDate);
+  seanceTime.setHours(hours, minutes, 0, 0);
+
+  const isToday = selectedDate === new Date().toISOString().split('T')[0];
+  const isPast = isToday && seanceTime < now;
+
+  return (
+    <button
+      key={id}
+      type="button"
+      className={`mc__time${isPast ? ' mc__time--disabled' : ''}`}
+      role="listitem"
+      aria-label={`Сеанс в ${time} в ${name}`}
+      onClick={!isPast ? () => handleTimeClick(id, time) : undefined}
+      disabled={isPast}
+    >
+      {time}
+    </button>
+  );
+})}
+
+      </div>
+    </section>
+  );
+})}
+
     </article>
   );
 };
