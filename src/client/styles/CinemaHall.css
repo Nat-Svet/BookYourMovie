@@ -5,29 +5,34 @@
 
 /* поскольку экспортировать изображение не получается, создаю свой экран */
 .screen {
-  width: 284px;         /* ширина ровно как 12 ячеек */
-  height: 20px;         /* тонкая полоска экрана */
+  width: 284px;
+  /* ширина ровно как 12 ячеек */
+  height: 20px;
+  /* тонкая полоска экрана */
   margin: 0 auto 20px auto;
   border: 1px solid #999;
   color: #ccc;
   font-weight: 600;
   font-size: 14px;
-  text-transform: lowercase;  
+  text-transform: lowercase;
   display: flex;
   justify-content: center;
   align-items: center;
   user-select: none;
-  background: transparent;   
+  background: transparent;
 }
 
 
 /* Ряд мест: flex-контейнер фиксированной ширины */
 .seat-row {
   display: flex;
-  justify-content: center; /* выравнивание по центру контейнера */
-  width: 100%; /* 284px из контейнера */
+  justify-content: center;
+  /* выравнивание по центру контейнера */
+  width: 100%;
+  /* 284px из контейнера */
   gap: 1px;
-  margin-bottom: 0.2rem; /* регулирует высоту между рядами */
+  margin-bottom: 0.2rem;
+  /* регулирует высоту между рядами */
 }
 
 /* разбираемся с местами */
@@ -41,7 +46,7 @@
   text-align: center;
   line-height: 28px;
   font-size: 12px;
-  border-radius: 4px !important; 
+  border-radius: 4px !important;
 }
 
 /* Пустое место — прозрачное, но занимает место */
@@ -51,7 +56,7 @@
   margin: 1px;
   pointer-events: none;
   background: transparent !important;
-  border: none !important;  
+  border: none !important;
 }
 
 .vip-seat {
@@ -62,33 +67,52 @@
 
 .vip-seat:hover,
 .vip-seat:focus {
-  background-color: #e6852f !important; /* чуть темнее при наведении */
+  background-color: #e6852f !important;
+  /* чуть темнее при наведении */
   border-color: #e6852f !important;
   color: #fff !important;
 }
 
 .seat.btn-info {
-  transform: scale(1.2);       /* увеличиваем размер на 20% */
-  transition: transform 0.2s ease; /* плавный переход */
-  z-index: 2;                  /* чтобы выделенные места были поверх остальных */
+  transform: scale(1.2);
+  /* увеличиваем размер на 20% */
+  transition: transform 0.2s ease;
+  /* плавный переход */
+  z-index: 2;
+  /* чтобы выделенные места были поверх остальных */
 }
 
 /* Цвета квадратиков мест */
 
 .free-seat {
-  background-color: #FFFFFF; /* свободное место */
+  background-color: #FFFFFF;
+  /* свободное место */
+  border: 1px solid #525252;
+  border-radius: 4px;
 }
 
 .busy-seat {
-  background-color: #525252; /* темный цвет для занято */
+  background: #171d24;
+  /* темный цвет для занято */
+  border: 1px solid #525252;
+  border-radius: 4px;
 }
 
 .vip-seat {
-  background-color: #F9953A; /* VIP оранжевый */
+  border: 1px solid #525252;
+  border-radius: 4px;
+  background: #f9953a;
+  /* VIP - свободный оранжевый */
 }
 
 .selected-seat {
-  background-color: #25C4CE; /* выбранный голубой */
+  border: 1px solid #525252;
+  border-radius: 4px;
+  width: 24px;
+  height: 24px;
+  box-shadow: 0 0 4px 0 #16a6af;
+  background: #25c4ce;
+  /* выбранный голубой */
 }
 
 
@@ -96,15 +120,16 @@
 /* разбираемся с легендой  */
 
 .legend {
- font-size: 14px;
- font-weight: 300;
- color: #FFFFFF;
- user-select: none;
- margin-left: 70px;
+  font-size: 14px;
+  font-weight: 300;
+  color: #FFFFFF;
+  user-select: none;
+  margin-left: 70px;
 }
 
 .legend-column {
-    min-width: 150px; /* задаем ширину колонок */
+  min-width: 150px;
+  /* задаем ширину колонок */
 }
 
 .legend-color {
@@ -113,8 +138,3 @@
   border-radius: 4px !important;
   border: 1px solid #525252 !important;
 }
-
-
-
-
-
