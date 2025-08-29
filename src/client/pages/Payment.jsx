@@ -1,5 +1,5 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import Layout from '../components/Layout';
 import ClientHeader from '../components/ClientHeader';
 import PaymentProcedure from '../components/PaymentProcedure';
@@ -7,6 +7,7 @@ import '../styles/Payment.css';
 
 const Payment = () => {
   const location = useLocation();
+  const navigate = useNavigate();
 
   if (!location.state) {
     return (
@@ -29,6 +30,18 @@ const Payment = () => {
     price
   } = location.state;
 
+  const handleCompletePayment = () => {
+    navigate('/ticket', {
+      state: {
+        filmName,
+        hallName,
+        sessionTime,
+        seats,
+        price
+      }
+    });
+  };
+
   return (
     <Layout>
       <div className="paymentprocedure-wrapper">
@@ -37,8 +50,9 @@ const Payment = () => {
           film={filmName}
           hall={hallName}
           sessionStart={sessionTime}
-          seats={seats?.map(s => `Ряд ${s.row} место ${s.seat}`).join(', ')}
+          seats={seats}
           price={price}
+          onComplete={handleCompletePayment} // ← передаём коллбэк
         />
       </div>
     </Layout>
