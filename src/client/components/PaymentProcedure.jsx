@@ -12,7 +12,12 @@ const PaymentProcedure = ({
     <div className="payment-container">
       <h3>ВЫ ВЫБРАЛИ БИЛЕТЫ:</h3>
       <p>На фильм: <strong>{film}</strong></p>
-      <p>Места: <strong>{seats.join(', ')}</strong></p>
+      <p>Места: <strong>{
+  Array.isArray(seats)
+    ? seats.map(s => `Ряд ${s.row} место ${s.seat}`).join(', ')
+    : seats
+}</strong></p>
+
       <p>В зале: <strong>{hall}</strong></p>
       <p>Начало сеанса: <strong>{sessionStart}</strong></p>
       <p>Стоимость: <strong>{price}</strong> рублей</p>

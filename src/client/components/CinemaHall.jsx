@@ -3,7 +3,11 @@ import { useLocation, useParams } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/CinemaHall.css";
 
-export default function CinemaHall({ seanceId: propSeanceId, sessionDate: propSessionDate }) {
+export default function CinemaHall({
+  seanceId: propSeanceId,
+  sessionDate: propSessionDate,
+  onSelectionChange,
+}) {
   const location = useLocation();
   const { seanceId: seanceIdFromParams } = useParams();
 
@@ -21,18 +25,16 @@ export default function CinemaHall({ seanceId: propSeanceId, sessionDate: propSe
     let ignore = false;
 
     async function load() {
-      console.log("DEBUG seanceId:", seanceId);
-console.log("DEBUG sessionDate:", sessionDate);
-
       if (!seanceId || !sessionDate) {
         setLoading(false);
         return;
       }
+
       try {
         setLoading(true);
         setError(null);
 
-        // Загрузка конфигурации зала
+        // 1) Конфигурация зала
         const res = await fetch(
           `https://shfe-diplom.neto-server.ru/hallconfig?seanceId=${seanceId}&date=${sessionDate}`
         );
@@ -42,13 +44,11 @@ console.log("DEBUG sessionDate:", sessionDate);
         const cfg = Array.isArray(json) ? json : Array.isArray(json.result) ? json.result : [];
         if (!ignore) setSeatMap(cfg);
 
-        // Загрузка всех данных (цены, залы, сеансы)
+        // 2) Общие данные (для цен)
         const resAll = await fetch("https://shfe-diplom.neto-server.ru/alldata");
         if (!resAll.ok) throw new Error("Не удалось загрузить данные о зале");
 
         const allData = await resAll.json();
-        console.log("DEBUG allData:", allData);
-
         const { halls, seances } = allData?.result || {};
         if (!Array.isArray(seances)) throw new Error("Некорректные данные сеансов");
         if (!Array.isArray(halls)) throw new Error("Некорректные данные залов");
@@ -76,14 +76,29 @@ console.log("DEBUG sessionDate:", sessionDate);
     };
   }, [seanceId, sessionDate]);
 
+  // Считаем выбранные места и сумму и сообщаем родителю
+  useEffect(() => {
+    if (!seatMap.length || standardPrice == null || vipPrice == null) return;
+
+    const selectedSeats = selected.map((id) => {
+      const [row, col] = id.split("-").map(Number);
+      return { row: row + 1, seat: col + 1, type: seatMap[row]?.[col] };
+    });
+
+    const totalPrice = selectedSeats.reduce(
+      (sum, s) => sum + (s.type === "vip" ? vipPrice : standardPrice),
+      0
+    );
+
+    // ВАЖНО: сам колбэк в родителе теперь мемоизирован, поэтому цикла не будет
+    onSelectionChange?.(selectedSeats, totalPrice);
+  }, [selected, seatMap, standardPrice, vipPrice, onSelectionChange]);
+
   function handleSelect(row, col) {
     const type = seatMap?.[row]?.[col];
     if (type === "disabled" || type === "taken") return;
-
     const id = `${row}-${col}`;
-    setSelected((prev) =>
-      prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
-    );
+    setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   }
 
   if (loading) {
@@ -118,13 +133,9 @@ console.log("DEBUG sessionDate:", sessionDate);
             const seatId = `${rowIndex}-${seatIndex}`;
             let seatClass = "seat btn btn-sm rounded-0";
 
-            if (seatType === "vip") {
-              seatClass += " vip-seat";
-            } else if (seatType === "taken") {
-              seatClass += " busy-seat";
-            } else {
-              seatClass += " btn-light free-seat";
-            }
+            if (seatType === "vip") seatClass += " vip-seat";
+            else if (seatType === "taken") seatClass += " busy-seat";
+            else seatClass += " btn-light free-seat";
 
             if (selected.includes(seatId)) {
               seatClass = "seat btn btn-sm rounded-0 btn-info selected-seat";

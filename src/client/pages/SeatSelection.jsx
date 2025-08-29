@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useLocation, useParams } from "react-router-dom";
+import React, { useEffect, useState, useCallback } from "react";
+import { useLocation, useParams, useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import ClientHeader from "../components/ClientHeader";
 import MovieInfo from "../components/MovieInfo";
@@ -10,13 +10,16 @@ import "../styles/SeatSelection.css";
 export default function SeatSelection() {
   const location = useLocation();
   const params = useParams();
+  const navigate = useNavigate();
 
-  // Сохраняем параметры в локальное состояние
   const [seanceData, setSeanceData] = useState({
     filmName: null,
     sessionTime: null,
     hallName: null,
   });
+
+  const [selectedSeats, setSelectedSeats] = useState([]);
+  const [totalPrice, setTotalPrice] = useState(0);
 
   useEffect(() => {
     if (location.state) {
@@ -24,6 +27,25 @@ export default function SeatSelection() {
       setSeanceData({ filmName, sessionTime, hallName });
     }
   }, [location.state]);
+
+  // Мемоизируем, чтобы не менять ссылку колбэка на каждом рендере
+  const handleSeatSelection = useCallback((seats, price) => {
+    setSelectedSeats(seats);
+    setTotalPrice(price);
+  }, []);
+
+  const handleBook = () => {
+    if (selectedSeats.length === 0) return;
+    navigate("/payment", {
+      state: {
+        filmName: seanceData.filmName,
+        sessionTime: seanceData.sessionTime,
+        hallName: seanceData.hallName,
+        seats: selectedSeats,
+        price: totalPrice,
+      },
+    });
+  };
 
   return (
     <Layout>
@@ -42,16 +64,18 @@ export default function SeatSelection() {
 
           <div className="cinema-hall-row">
             <CinemaHall
-  seanceId={location.state?.seanceId || params.seanceId}
-  sessionDate={location.state?.sessionDate || new Date().toISOString().split("T")[0]}
-/>
-
-
-
+              seanceId={location.state?.seanceId || params.seanceId}
+              sessionDate={
+                location.state?.sessionDate || new Date().toISOString().split("T")[0]
+              }
+              onSelectionChange={handleSeatSelection}
+            />
           </div>
 
           <div className="button-row">
-            <Button>Забронировать</Button>
+            <Button onClick={handleBook} disabled={selectedSeats.length === 0}>
+              Забронировать
+            </Button>
           </div>
         </main>
       </div>
