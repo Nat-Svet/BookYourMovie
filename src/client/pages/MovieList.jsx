@@ -23,7 +23,7 @@ const MovieList = () => {
         setLoading(true);
         const api = new API();
         const data = await api.getAllData();
-        
+
         const transformedMovies = transformApiData(data);
         setMovies(transformedMovies);
       } catch (err) {
@@ -37,97 +37,91 @@ const MovieList = () => {
     fetchData();
   }, []);
 
+  const isHallOpen = (hall) => {
+    const raw = hall?.hall_open ?? hall?.is_open ?? hall?.open;
+    if (typeof raw === 'boolean') return raw;
+    if (typeof raw === 'number') return raw === 1;
+    if (typeof raw === 'string') return raw === '1' || raw.toLowerCase() === 'true';
+    return false;
+  };
 
-const isHallOpen = (hall) => {
-  const raw = hall?.hall_open ?? hall?.is_open ?? hall?.open;
-  if (typeof raw === 'boolean') return raw;
-  if (typeof raw === 'number') return raw === 1;
-  if (typeof raw === 'string') return raw === '1' || raw.toLowerCase() === 'true';
-  return false;
-};
+  const transformApiData = (apiData) => {
+    if (!apiData || !apiData.films || !apiData.halls || !apiData.seances) {
+      return [];
+    }
 
-const transformApiData = (apiData) => {
-  if (!apiData || !apiData.films || !apiData.halls || !apiData.seances) {
-    return [];
-  }
+    const { films, halls, seances } = apiData;
+    const hallsById = new Map(halls.map(h => [h.id, h]));
 
-  const { films, halls, seances } = apiData;
+    const openSeances = seances.filter(seance => {
+      const hall = hallsById.get(seance.seance_hallid);
+      return hall && isHallOpen(hall);
+    });
 
-  // Создаем Map по id залов
-  const hallsById = new Map(halls.map(h => [h.id, h]));
+    return films
+      .map(film => {
+        const filmSeances = openSeances.filter(s => s.seance_filmid === film.id);
 
-  // Фильтруем только сеансы в открытых залах
-  const openSeances = seances.filter(seance => {
-    const hall = hallsById.get(seance.seance_hallid);
-    return hall && isHallOpen(hall);
-  });
+        const hallsWithSeances = filmSeances.reduce((acc, seance) => {
+          const hall = hallsById.get(seance.seance_hallid);
+          if (!hall) return acc;
 
-  // Строим карту залов с сеансами по фильмам
-  return films
-    .map(film => {
-      const filmSeances = openSeances.filter(s => s.seance_filmid === film.id);
+          const hallName = hall.hall_name;
+          if (!acc[hallName]) acc[hallName] = [];
 
-      // группировка по залам
-      const hallsWithSeances = filmSeances.reduce((acc, seance) => {
-        const hall = hallsById.get(seance.seance_hallid);
-        if (!hall) return acc;
+          acc[hallName].push({
+            time: seance.seance_time,
+            id: seance.id,
+            hallId: hall.id,
+          });
 
-        const hallName = hall.hall_name;
-        if (!acc[hallName]) acc[hallName] = [];
+          return acc;
+        }, {});
 
-        acc[hallName].push({
-          time: seance.seance_time,
-          id: seance.id
+        const hallsArray = Object.entries(hallsWithSeances).map(([name, seances]) => {
+          const hall = halls.find(h => h.hall_name === name);
+          return {
+            id: hall?.id,
+            name,
+            seances: seances.sort((a, b) => {
+              const [h1, m1] = a.time.split(':').map(Number);
+              const [h2, m2] = b.time.split(':').map(Number);
+              return h1 * 60 + m1 - (h2 * 60 + m2);
+            }),
+          };
         });
 
-        return acc;
-      }, {});
-
-      const hallsArray = Object.entries(hallsWithSeances).map(([name, seances]) => ({
-        name,
-        seances: seances.sort((a, b) => {
-          const [h1, m1] = a.time.split(':').map(Number);
-          const [h2, m2] = b.time.split(':').map(Number);
-          return h1 * 60 + m1 - (h2 * 60 + m2);
-        })
-      }));
-
-      return {
-        id: film.id,
-        title: film.film_name,
-        description: film.film_description || '',
-        durationCountry: film.film_origin
-          ? `${film.film_duration} минут · ${film.film_origin}`
-          : `${film.film_duration} минут`,
-        imageSrc: film.film_poster || '/default-poster.png',
-        halls: hallsArray
-      };
-    })
-    .filter(movie => movie.halls.length > 0);
-};
-
-
-
+        return {
+          id: film.id,
+          title: film.film_name,
+          description: film.film_description || '',
+          durationCountry: film.film_origin
+            ? `${film.film_duration} минут · ${film.film_origin}`
+            : `${film.film_duration} минут`,
+          imageSrc: film.film_poster || '/default-poster.png',
+          halls: hallsArray,
+        };
+      })
+      .filter(movie => movie.halls.length > 0);
+  };
 
   const handleDateChange = (newDate) => {
     setSelectedDate(newDate);
   };
 
   const handleTimeClick = (seanceId, time, date) => {
-    // Переходим на страницу выбора мест
-    navigate(`/booking/${seanceId}`, { 
-      state: { 
-        seanceId, 
-        date, 
-        time 
-      } 
+    navigate(`/booking/${seanceId}`, {
+      state: {
+        seanceId,
+        date,
+        time,
+      },
     });
   };
 
   const handleLoginClick = () => {
-  navigate('/admin/login'); // ✅ это ведёт на страницу Login
-};
-
+    navigate('/admin/login');
+  };
 
   if (loading) {
     return (
@@ -184,8 +178,8 @@ const transformApiData = (apiData) => {
           ) : (
             <div className="no-movies">Нет доступных фильмов</div>
           )}
-        </div> 
-      </div>        
+        </div>
+      </div>
     </Layout>
   );
 };

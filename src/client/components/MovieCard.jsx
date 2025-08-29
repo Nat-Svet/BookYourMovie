@@ -12,7 +12,7 @@ const MovieCard = ({
 }) => {
   const navigate = useNavigate();
 
-  const handleTimeClick = (seanceId, time, hallName) => {
+  const handleTimeClick = (seanceId, time, hallName, hallId) => {
     const seanceDateTime = `${selectedDate} ${time}`;
 
     navigate(`/booking/${seanceId}`, {
@@ -21,6 +21,7 @@ const MovieCard = ({
         sessionTime: time,
         sessionDate: selectedDate,
         hallName,
+        hallId, // ✅ передаём hallId
         seanceId,
         seanceDateTime,
       },
@@ -31,20 +32,18 @@ const MovieCard = ({
     <article className="mc">
       <div className="mc__top">
         <img className="mc__poster" src={imageSrc} alt={title} loading="lazy" />
-
         <div className="mc__info">
           <h3 className="mc__title">
             <span className="mc__title-accent" aria-hidden="true" />
             {title}
           </h3>
-
           <p className="mc__desc">{description}</p>
           <p className="mc__meta">{durationCountry}</p>
         </div>
       </div>
 
       {halls &&
-        halls.map(({ name, seances }) => {
+        halls.map(({ id: hallId, name, seances }) => {
           const sortedSeances = [...seances].sort((a, b) => {
             const [h1, m1] = a.time.split(":").map(Number);
             const [h2, m2] = b.time.split(":").map(Number);
@@ -71,7 +70,7 @@ const MovieCard = ({
                       className={`mc__time${isPast ? " mc__time--disabled" : ""}`}
                       role="listitem"
                       aria-label={`Сеанс в ${time} в ${name}`}
-                      onClick={!isPast ? () => handleTimeClick(id, time, name) : undefined}
+                      onClick={!isPast ? () => handleTimeClick(id, time, name, hallId) : undefined}
                       disabled={isPast}
                     >
                       {time}

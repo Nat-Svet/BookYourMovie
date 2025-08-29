@@ -41,7 +41,13 @@ export default function SeatSelection() {
           </div>
 
           <div className="cinema-hall-row">
-            <CinemaHall seanceId={params.seanceId} />
+            <CinemaHall
+  seanceId={location.state?.seanceId || params.seanceId}
+  sessionDate={location.state?.sessionDate || new Date().toISOString().split("T")[0]}
+/>
+
+
+
           </div>
 
           <div className="button-row">

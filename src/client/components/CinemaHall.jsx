@@ -3,27 +3,27 @@ import { useLocation, useParams } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/CinemaHall.css";
 
-export default function CinemaHall() {
+export default function CinemaHall({ seanceId: propSeanceId, sessionDate: propSessionDate }) {
   const location = useLocation();
-  const { seanceId: seanceIdFromState, sessionDate: sessionDateFromState } = location.state || {};
   const { seanceId: seanceIdFromParams } = useParams();
 
-  const searchParams = new URLSearchParams(location.search);
-  const seanceId = seanceIdFromState || seanceIdFromParams || null;
-  const sessionDate =
-    sessionDateFromState ||
-    searchParams.get("date") ||
-    new Date().toISOString().split("T")[0];
+  const seanceId = propSeanceId || seanceIdFromParams || null;
+  const sessionDate = propSessionDate || new Date().toISOString().split("T")[0];
 
   const [seatMap, setSeatMap] = useState([]);
   const [selected, setSelected] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [standardPrice, setStandardPrice] = useState(null);
+  const [vipPrice, setVipPrice] = useState(null);
 
   useEffect(() => {
     let ignore = false;
 
     async function load() {
+      console.log("DEBUG seanceId:", seanceId);
+console.log("DEBUG sessionDate:", sessionDate);
+
       if (!seanceId || !sessionDate) {
         setLoading(false);
         return;
@@ -32,6 +32,7 @@ export default function CinemaHall() {
         setLoading(true);
         setError(null);
 
+        // Загрузка конфигурации зала
         const res = await fetch(
           `https://shfe-diplom.neto-server.ru/hallconfig?seanceId=${seanceId}&date=${sessionDate}`
         );
@@ -40,6 +41,28 @@ export default function CinemaHall() {
         const json = await res.json();
         const cfg = Array.isArray(json) ? json : Array.isArray(json.result) ? json.result : [];
         if (!ignore) setSeatMap(cfg);
+
+        // Загрузка всех данных (цены, залы, сеансы)
+        const resAll = await fetch("https://shfe-diplom.neto-server.ru/alldata");
+        if (!resAll.ok) throw new Error("Не удалось загрузить данные о зале");
+
+        const allData = await resAll.json();
+        console.log("DEBUG allData:", allData);
+
+        const { halls, seances } = allData?.result || {};
+        if (!Array.isArray(seances)) throw new Error("Некорректные данные сеансов");
+        if (!Array.isArray(halls)) throw new Error("Некорректные данные залов");
+
+        const foundSeance = seances.find((s) => s.id === Number(seanceId));
+        if (!foundSeance) throw new Error("Сеанс не найден");
+
+        const foundHall = halls.find((h) => h.id === foundSeance.seance_hallid);
+        if (!foundHall) throw new Error("Зал не найден");
+
+        if (!ignore) {
+          setStandardPrice(foundHall.hall_price_standart);
+          setVipPrice(foundHall.hall_price_vip);
+        }
       } catch (e) {
         if (!ignore) setError(e.message || "Ошибка загрузки схемы зала");
       } finally {
@@ -129,11 +152,11 @@ export default function CinemaHall() {
         <div className="legend-column d-flex flex-column gap-3">
           <div className="legend-item d-flex align-items-center gap-2">
             <div className="legend-color free-seat"></div>
-            <span>Свободно (250руб)</span>
+            <span>Свободно ({standardPrice ?? "—"} руб)</span>
           </div>
           <div className="legend-item d-flex align-items-center gap-2">
             <div className="legend-color vip-seat"></div>
-            <span>Свободно VIP (350руб)</span>
+            <span>Свободно VIP ({vipPrice ?? "—"} руб)</span>
           </div>
         </div>
         <div className="legend-column d-flex flex-column gap-3">
