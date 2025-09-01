@@ -10,8 +10,16 @@ const PaymentProcedure = ({
   onComplete // ← добавляем пропс
 }) => {
   return (
+
+<div className="payment-wrapper">
+
     <div className="payment-container">
-      <h3>ВЫ ВЫБРАЛИ БИЛЕТЫ:</h3>
+      <h3>ВЫ ВЫБРАЛИ БИЛЕТЫ:</h3> 
+
+<div className="dot-separator-container">
+  <div className="dot-separator" />
+</div>
+
       <p>На фильм: <strong>{film}</strong></p>
       <p>Места: <strong>{
         Array.isArray(seats)
@@ -30,6 +38,8 @@ const PaymentProcedure = ({
         После оплаты билет будет доступен в этом окне, а также придёт вам на почту. Покажите QR-код нашему контроллёру у входа в зал.<br />
         Приятного просмотра!
       </p>
+    </div>
+
     </div>
   );
 };
