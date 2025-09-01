@@ -5,6 +5,8 @@ import ClientHeader from "../components/ClientHeader";
 import MovieInfo from "../components/MovieInfo";
 import CinemaHall from "../components/CinemaHall";
 import Button from "../components/Button";
+import Tooltip from "../components/Tooltip";
+
 import "../styles/SeatSelection.css";
 
 export default function SeatSelection() {
@@ -62,7 +64,7 @@ export default function SeatSelection() {
             />
           </div>
 
-          <div className="cinema-hall-row">
+          <div className="cinema-hall-row position-relative">
             <CinemaHall
               seanceId={location.state?.seanceId || params.seanceId}
               sessionDate={
@@ -70,6 +72,7 @@ export default function SeatSelection() {
               }
               onSelectionChange={handleSeatSelection}
             />
+            <Tooltip />
           </div>
 
           <div className="button-row">

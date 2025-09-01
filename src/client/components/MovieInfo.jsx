@@ -1,5 +1,4 @@
 import React from "react";
-import Tooltip from './Tooltip';
 import "../styles/MovieInfo.css";
 
 export default function MovieInfo({ filmName, sessionTime, hallName }) {
@@ -13,12 +12,9 @@ export default function MovieInfo({ filmName, sessionTime, hallName }) {
           Начало сеанса: {sessionTime || "--:--"}
         </div>
         <div className="movie-info__hall">
-  {hallName || "Зал не выбран"}
-</div>
+          {hallName || "Зал не выбран"}
+        </div>
 
-      </div>
-      <div className="movie-info__tooltip">
-        <Tooltip />
       </div>
     </div>
   );

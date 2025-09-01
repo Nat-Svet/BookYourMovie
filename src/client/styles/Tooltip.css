@@ -1,14 +1,21 @@
 .tooltip-container {
+  position: absolute;
+  top: -100px;
+  right: -60px;
+  transform: translateX(-50%);
+  background-color: transparent;
+  color: white;
+  padding: 8px 10px;
+  gap: 8px;
   display: flex;
   align-items: center;
-  gap: 8px;
-  position: absolute; /* или relative в зависимости от места размещения */
-  top: 10px; /* подкорректировать по макету */
-  right: 10px; /* подкорректировать по макету */
-  background: transparent;
+  z-index: 999;
+  font-size: 13px;
+  pointer-events: none;
   user-select: none;
   margin-top: 1rem;
   margin-right: 1rem;
+
 }
 
 .tooltip-icon {
@@ -23,4 +30,16 @@
   font-weight: 200;
   line-height: 1.2;
   white-space: pre-line; /* чтобы переносы <br> работали */
+}
+
+/* 🚫 По умолчанию скрыт */
+.tooltip-container {
+  display: none;
+}
+
+/* ✅ Виден только на мобильных и планшетах */
+@media (max-width: 1199px) {
+  .tooltip-container {
+    display: flex;
+  }
 }
