@@ -179,7 +179,7 @@ export default function CinemaHall({
                   type="button"
                   disabled={seatType === "taken"} // Блокировка занятых мест //
                 >
-                  {seatIndex + 1} {/* Отображение номера места */}
+                  {/*{seatIndex + 1}  Отображение номера места */}
                 </button>
               </div>
             );
