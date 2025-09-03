@@ -1,5 +1,5 @@
 .ticket-page {
-  background-color: transparent; 
+  background-color: transparent;
   max-width: 900px;
   margin: 0 auto;
   padding: 0 !important;
@@ -8,18 +8,24 @@
 }
 
 
-/* адаптивные стили */
+/* --адаптивные стили-- */
+
 /* во всю ширину страницы для планшетов и мобильников */
 
 @media (max-width: 1199px) {
   .ticket-page {
-    max-width: 100vw;      /* ширина равна ширине окна */
-    width: 100vw;          /* растягиваем по всей ширине */
-    margin: 0;             /* убираем автоматические отступы */
-    border-radius: 0;      /* убираем скругления */
-    padding-left: 15px;    /* чтобы текст не прилипал к краям */
+    max-width: 100vw;
+    /* ширина равна ширине окна */
+    width: 100vw;
+    /* растягиваем по всей ширине */
+    margin: 0;
+    /* убираем автоматические отступы */
+    border-radius: 0;
+    /* убираем скругления */
+    padding-left: 15px;
+    /* чтобы текст не прилипал к краям */
     padding-right: 15px;
-    box-sizing: border-box; /* учитываем padding в ширине */
+    box-sizing: border-box;
+    /* учитываем padding в ширине */
   }
 }
-

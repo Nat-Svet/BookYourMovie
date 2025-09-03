@@ -56,7 +56,8 @@
 .trash-icon {
     width: 12px;
     height: 12px;
-    pointer-events: none; /* чтобы клики проходили на кнопку */
+    pointer-events: none;
+    /* чтобы клики проходили на кнопку */
     display: block;
 }
 
@@ -75,7 +76,7 @@
     font-weight: 500;
     box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.12), 0 3px 3px 0 rgba(0, 0, 0, 0.24);
     user-select: none;
-    }
+}
 
 .manage-halls-create:hover {
     background-color: #147474;
@@ -85,11 +86,14 @@
 /*вертикальная линия */
 .vertical-line {
     position: absolute;
-    top: 70px; /* начало строго под кругом */
-    left: 69px; /* центр круга */
+    top: 70px;
+    /* начало строго под кругом */
+    left: 69px;
+    /* центр круга */
     width: 2px;
     background-color: #BC95D6;
-    bottom: 0;  /* отступ от нижнего края компонента */
+    bottom: 0;
+    /* отступ от нижнего края компонента */
     z-index: 0;
 }
 
@@ -99,8 +103,11 @@
 /* Мобильная версия: центрируем кнопку "СОЗДАТЬ ЗАЛ" */
 @media (max-width: 767px) {
     .manage-halls-create {
-        display: block; /* чтобы сработали margin: auto */
-        width: max-content; /* кнопка под размер текста */
-        margin: 12px auto 0; /* центрирование */
+        display: block;
+        /* чтобы сработали margin: auto */
+        width: max-content;
+        /* кнопка под размер текста */
+        margin: 12px auto 0;
+        /* центрирование */
     }
 }

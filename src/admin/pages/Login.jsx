@@ -7,14 +7,14 @@ import '../styles/Login.css';
 const Login = () => {
   return (
     <AdminLayout>
-     
-     <div className="login-container">
-      <AdminHeader />
-   
-      <LoginForm />
-     </div>
-    
-     
+
+      <div className="login-container">
+        <AdminHeader />
+
+        <LoginForm />
+      </div>
+
+
     </AdminLayout>
   );
 };

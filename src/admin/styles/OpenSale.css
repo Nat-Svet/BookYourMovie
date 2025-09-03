@@ -32,7 +32,7 @@
     margin-bottom: 20px;
     font-size: 16px;
     font-weight: 400;
-    
+
 }
 
 /*работа с кнопками */
@@ -98,7 +98,8 @@
 /* работа с кнопкой открытия продаж */
 .button-container {
     display: flex;
-    justify-content: center;   /* центрирует по горизонтали */
+    justify-content: center;
+    /* центрирует по горизонтали */
     margin-top: 20px;
 }
 
@@ -124,7 +125,7 @@
     line-height: 114%;
     text-align: center;
     box-shadow: 0 0 3px 0 rgba(0, 0, 0, 0.12), 0 3px 3px 0 rgba(0, 0, 0, 0.24);
-    }
+}
 
 
 .open-sale-final-button:hover {

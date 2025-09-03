@@ -128,7 +128,7 @@
 }
 
 
-/* Адаптивность */
+/* --адаптивность-- */
 @media (max-width: 575px) {
   .mc__top {
     align-items: flex-start;

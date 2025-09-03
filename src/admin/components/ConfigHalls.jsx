@@ -1,11 +1,7 @@
-// Импорт необходимых модулей React и Bootstrap
 import React, { useState, useEffect } from 'react';
 import "bootstrap/dist/css/bootstrap.min.css";
-// Импорт компонента заголовка аккордеона
 import AccordionHeader from './AccordionHeader';
-// Импорт стилей для компонента конфигурации залов
 import '../styles/ConfigHalls.css';
-// Импорт API для взаимодействия с сервером
 import API from '../../api/api';
 
 // Создание экземпляра API
@@ -80,9 +76,9 @@ const ConfigHalls = ({ halls }) => {
 
     try {
       // Преобразуем числовые типы мест в строковые согласно API
-      const config = seatTypes.map(row => 
+      const config = seatTypes.map(row =>
         row.map(seatType => {
-          switch(seatType) {
+          switch (seatType) {
             case 0: return 'standart';
             case 1: return 'vip';
             case 2: return 'disabled';
@@ -126,13 +122,13 @@ const ConfigHalls = ({ halls }) => {
   return (
     <section className="config-hall">
       {/* Заголовок аккордеона */}
-      <AccordionHeader 
+      <AccordionHeader
         title="КОНФИГУРАЦИЯ ЗАЛОВ"
         isOpen={isOpen}
         toggleOpen={toggleOpen}
       />
 
-      {/* Визуальный разделитель */}
+      {/* Вертикальная линия */}
       <div className="vertical-line-container">
         <div className="vertical-line top-part"></div>
         <div className="vertical-line bottom-part"></div>
@@ -202,8 +198,8 @@ const ConfigHalls = ({ halls }) => {
                   {row.map((seatType, seatIndex) => {
                     const seatClass =
                       seatType === 0 ? 'seat-normal'
-                      : seatType === 1 ? 'seat-vip'
-                      : 'seat-blocked';
+                        : seatType === 1 ? 'seat-vip'
+                          : 'seat-blocked';
 
                     return (
                       <div
@@ -221,15 +217,15 @@ const ConfigHalls = ({ halls }) => {
 
           {/* Кнопки действий */}
           <div className="config-hall-buttons">
-            <button 
-              className="btn btn-cancel" 
+            <button
+              className="btn btn-cancel"
               onClick={handleCancel}
               disabled={isLoading}
             >
               ОТМЕНА
             </button>
-            <button 
-              className="btn btn-save" 
+            <button
+              className="btn btn-save"
               onClick={handleSave}
               disabled={isLoading}
             >
@@ -242,5 +238,5 @@ const ConfigHalls = ({ halls }) => {
   );
 };
 
-// Экспорт компонента
+
 export default ConfigHalls;

@@ -1,7 +1,7 @@
-import React from 'react'; // Импорт библиотеки React //
-import '../styles/ClientHeader.css'; // стили //
+import React from 'react';
+import '../styles/ClientHeader.css';
 
-// Компонент заголовка, отображающий логотип/название сайта //
+
 const Header = () => {
   return (
     // Основной заголовок с классом для стилизации //
@@ -13,4 +13,4 @@ const Header = () => {
   );
 };
 
-export default Header; // Экспорт компонента по умолчанию //
+export default Header; 

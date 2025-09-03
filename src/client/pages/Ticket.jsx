@@ -6,9 +6,10 @@ import ETicket from "../components/ETicket";
 import "../styles/Ticket.css";
 
 const Ticket = () => {
-  const location = useLocation();
-  const navigate = useNavigate();
+  const location = useLocation(); // получаем переданные на эту страницу данные //
+  const navigate = useNavigate(); // (зачем написала - не помню,  может пригодиться)
 
+  // Если пользователь попал на страницу напрямую, без данных — показываем сообщение //
   if (!location.state) {
     return (
       <Layout>
@@ -22,6 +23,7 @@ const Ticket = () => {
     );
   }
 
+  // Извлекаем данные о билете из состояния маршрута //
   const {
     filmName,
     hallName,
@@ -30,10 +32,13 @@ const Ticket = () => {
     price
   } = location.state;
 
+  // Рендерим страницу с билетом //
   return (
     <Layout>
       <div className="ticket-page">
         <ClientHeader />
+
+        {/* Электронный билет с переданными данными */}
         <ETicket
           movie={filmName}
           seats={seats}
@@ -41,6 +46,7 @@ const Ticket = () => {
           startTime={sessionTime}
           price={price}
         />
+
       </div>
     </Layout>
   );

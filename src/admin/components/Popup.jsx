@@ -1,10 +1,5 @@
-// src/components/Popup.jsx
-
-// Импорт React и необходимых модулей
 import React from 'react';
-// Импорт ReactDOM для использования порталов
 import ReactDOM from 'react-dom';
-// Импорт стилей для компонента попапа
 import '../styles/Popup.css';
 
 // Определение компонента Popup с деструктуризацией пропсов
@@ -86,5 +81,5 @@ const Popup = ({ visible, title, fields = [], buttons = [], onClose }) => {
   return ReactDOM.createPortal(popupContent, document.getElementById('popup-root'));
 };
 
-// Экспорт компонента Popup по умолчанию
+
 export default Popup;

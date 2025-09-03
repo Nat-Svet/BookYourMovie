@@ -5,7 +5,8 @@ body,
   padding: 0;
   width: 100%;
   min-height: 100vh;
-  overflow-x: hidden; /* Запрет горизонтального скролла страницы */
+  overflow-x: hidden;
+  /* Запрет горизонтального скролла страницы */
 }
 
 /* Контейнеры  */
@@ -75,16 +76,20 @@ body,
   .movie-list-container,
   .dates-nav,
   .movie-list-movies {
-    max-width: 100% !important; /* убираем ограничение ширины */
-    margin-left: 0 !important; /* убираем автоматические отступы */
+    max-width: 100% !important;
+    /* убираем ограничение ширины */
+    margin-left: 0 !important;
+    /* убираем автоматические отступы */
     margin-right: 0 !important;
-    padding-left: 0 !important; /* если есть padding, убрать */
+    padding-left: 0 !important;
+    /* если есть padding, убираем */
     padding-right: 0 !important;
     width: 100% !important;
   }
 
   .dates-list {
-    overflow-x: auto; /* Включаем горизонтальный скролл */
+    overflow-x: auto;
+    /* Включаем горизонтальный скролл */
   }
 
   .date-item {
@@ -97,13 +102,16 @@ body,
     max-width: none !important;
     flex-grow: 1 !important;
     flex-basis: 0 !important;
-    height: 48px; /* чтобы совпадала по высоте */
-    width: auto !important; /* чтобы ширина подстраивалась */
+    height: 48px;
+    /* чтобы совпадала по высоте */
+    width: auto !important;
+    /* чтобы ширина подстраивалась */
   }
 
 }
 
 .layout {
   max-height: fit-content;
-  overflow: hidden;   /* чтобы обрезать лишний фон */
+  overflow: hidden;
+  /* чтобы обрезать лишний фон */
 }

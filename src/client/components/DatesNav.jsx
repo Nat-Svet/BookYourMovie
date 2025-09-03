@@ -59,7 +59,7 @@ const DatesNav = ({ onDateChange, selectedDate: externalSelectedDate }) => {
   // Обработчик клика по дате //
   const handleDateClick = (dateString) => {
     setSelectedDate(dateString);
-     // Вызываем колбэк при изменении даты //
+    // Вызываем колбэк при изменении даты  //
     if (onDateChange) onDateChange(dateString);
   };
 
@@ -72,7 +72,7 @@ const DatesNav = ({ onDateChange, selectedDate: externalSelectedDate }) => {
     // Выбираем последнюю дату из нового массива //
     const newSelected = nextDates[nextDates.length - 1].dateString;
     setSelectedDate(newSelected);
-     // Вызываем колбэк с новой датой //
+    // Вызываем колбэк с новой датой //
     if (onDateChange) onDateChange(newSelected);
   };
 
@@ -89,7 +89,7 @@ const DatesNav = ({ onDateChange, selectedDate: externalSelectedDate }) => {
             role="button" // Указываем роль для доступности //
             aria-pressed={dateString === selectedDate} // Состояние для доступности //
             onClick={() => handleDateClick(dateString)}
-           // Обработчик нажатия клавиши Enter //
+            // Обработчик нажатия клавиши Enter //
             onKeyDown={(e) => e.key === 'Enter' && handleDateClick(dateString)}
           >
             <div className="day-name">
@@ -97,7 +97,7 @@ const DatesNav = ({ onDateChange, selectedDate: externalSelectedDate }) => {
               {isToday ? 'Сегодня' : dayName}
             </div>
             <div className="day-number">
-               {/* Для сегодняшнего дня показываем дополнительную информацию */} 
+              {/* Для сегодняшнего дня показываем дополнительную информацию */}
               {isToday ? `${dayName}, ${dayNumber}` : dayNumber}
             </div>
           </li>

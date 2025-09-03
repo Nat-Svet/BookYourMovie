@@ -12,7 +12,7 @@
 .content {
   background: rgba(241, 235, 230, 0.95);
   border-radius: 4px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.3);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
   padding: 0 0 20px 0;
   width: 100%;
   display: flex;
@@ -20,22 +20,28 @@
   gap: 20px;
 }
 
-/* Мобильные и планшетные устройства */
+/* -- адаптивность -- */
+
 @media (max-width: 1199px) {
   .seat-selection-page {
-    max-width: 100vw;  /* чтобы контейнер мог растягиваться на всю ширину */
-    padding: 0;        /* убираем внутренние отступы, чтобы не сужать .content */
+    max-width: 100vw;
+    /* чтобы контейнер мог растягиваться на всю ширину */
+    padding: 0;
+    /* убираем внутренние отступы, чтобы не сужать .content */
   }
 
   .content {
     position: relative;
-    width: 100vw;               /* растягиваем на всю ширину экрана */
+    width: 100vw;
+    /* растягиваем на всю ширину экрана */
     max-width: 100vw;
-    margin-left: calc(-50vw + 50%);  /* смещаем влево, чтобы выйти за пределы родителя */
+    margin-left: calc(-50vw + 50%);
+    /* смещаем влево, чтобы выйти за пределы родителя */
     margin-right: calc(-50vw + 50%);
     border-radius: 0;
     box-shadow: none;
-    padding-left: 0px;         /* внутренние отступы по бокам */
+    padding-left: 0px;
+    /* внутренние отступы по бокам */
     padding-right: 0px;
     box-sizing: border-box;
   }
@@ -51,4 +57,3 @@
   max-width: 100%;
   margin: 0 auto;
 }
-

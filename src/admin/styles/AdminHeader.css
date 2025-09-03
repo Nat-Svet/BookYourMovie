@@ -5,7 +5,7 @@
     padding-bottom: 0;
     display: flex;
     flex-direction: column;
-    }
+}
 
 .admin_header-title {
     font-size: 34px;
@@ -36,15 +36,20 @@
 
 @media (max-width: 767px) {
     .admin_header {
-        width: 100%; /* вместо 972px */
-        padding-left: 0; /* убираем сдвиг влево */
+        width: 100%;
+        /* вместо 972px */
+        padding-left: 0;
+        /* убираем сдвиг влево */
         padding-right: 0;
         padding-top: 16px;
-        margin: 0; /* на всякий случай */
+        margin: 0;
+        /* на всякий случай */
         display: flex;
         flex-direction: column;
-        align-items: center; /* центр по горизонтали */
-        text-align: center; /* текст по центру */
+        align-items: center;
+        /* центр по горизонтали */
+        text-align: center;
+        /* текст по центру */
     }
 
     .admin_header-title,

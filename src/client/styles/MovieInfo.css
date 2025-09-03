@@ -3,27 +3,28 @@
   height: 80px;
   background-color: transparent;
   padding: 12px 16px 0 16px;
-  }
+}
 
 .movie-info__title {
   font-weight: 700;
   font-size: 16px;
   margin-bottom: 4px;
-  }
+}
 
 .movie-info__session {
   font-weight: 300;
   font-size: 14px;
   margin-bottom: 6px;
-  }
+}
 
 .movie-info__hall {
   font-weight: 700;
   font-size: 16px;
-  }
+}
 
 .movie-info__tooltip {
-  margin-left: 20px; /* Отступ слева от основного блока */
+  margin-left: 20px;
+  /* Отступ слева от основного блока */
 }
 
 /* Скрываем по умолчанию */
@@ -31,7 +32,8 @@
   display: none;
 }
 
-/* Планшеты и мобильные  */
+/* --адаптивные стили --  */
+
 @media (max-width: 1199px) {
   .movie-info__tooltip {
     display: block;
@@ -40,8 +42,11 @@
 
 @media (max-width: 768px) {
   .movie-info__title {
-    white-space: normal;    /* разрешаем перенос строк */
-    word-wrap: break-word;  /* переносим длинные слова */
-    max-width: 260px;       /* ограничиваем ширину блока */
+    white-space: normal;
+    /* разрешаем перенос строк */
+    word-wrap: break-word;
+    /* переносим длинные слова */
+    max-width: 260px;
+    /* ограничиваем ширину блока */
   }
 }

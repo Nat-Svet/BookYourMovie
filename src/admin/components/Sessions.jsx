@@ -6,16 +6,17 @@ import Popup from './Popup';
 import API from '../../api/api';
 import '../styles/Sessions.css';
 
-const DAY_MIN = 24 * 60;
+const DAY_MIN = 24 * 60; // Кол-во минут в сутках //
 
 const Sessions = ({ halls }) => {
-  const [isOpen, setIsOpen] = useState(true);
-  const [movies, setMovies] = useState([]);
-  const [sessions, setSessions] = useState({});
-  const [draggedMovie, setDraggedMovie] = useState(null);
-  const [draggedSession, setDraggedSession] = useState(null);
-  const [popupData, setPopupData] = useState({ visible: false, movieId: null, hall: '', time: '' });
-  const [addMoviePopupVisible, setAddMoviePopupVisible] = useState(false);
+  const [isOpen, setIsOpen] = useState(true); // открыт ли аккордеон //
+  const [movies, setMovies] = useState([]); // список фильмов //
+  const [sessions, setSessions] = useState({}); // сеансы по залам //
+  const [draggedMovie, setDraggedMovie] = useState(null); // перетаскиваемый фильм //
+  const [draggedSession, setDraggedSession] = useState(null); // перетаскиваемый сеанс //
+  const [popupData, setPopupData] = useState({ visible: false, movieId: null, hall: '', time: '' }); // попап для добавления сеанса //
+  const [addMoviePopupVisible, setAddMoviePopupVisible] = useState(false); // попап для добавления фильма //
+  // данные нового фильма //
   const [newMovieData, setNewMovieData] = useState({
     title: '',
     duration: '',
@@ -24,20 +25,20 @@ const Sessions = ({ halls }) => {
     color: '#ffffff',
     posterFile: null
   });
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false); // состояние загрузки //
 
   const api = new API();
 
-  // Цвет по id фильма (сохранение стиля проекта)
+  // Цвет по id фильма //
   const getColorByIndex = (id) => {
     const colors = ['#CAFF85', '#85FF89', '#85FFD3', '#85E2FF', '#8599FF'];
     return colors[(id - 1) % colors.length];
   };
 
+  // переключение аккордиона //
   const toggleOpen = () => setIsOpen(!isOpen);
 
-  // --- helpers ---
-
+  // Преобразование сеансов с сервера в формат: { "Зал 1": [сеанс, сеанс] } //
   const transformSeances = (seancesData) => {
     const sessionsByHall = {};
     if (seancesData) {
@@ -57,6 +58,7 @@ const Sessions = ({ halls }) => {
     return sessionsByHall;
   };
 
+  // Загрузка всех фильмов и сеансов //
   const loadAllData = async () => {
     const token = localStorage.getItem('token');
     if (token) api.setToken(token);
@@ -77,6 +79,7 @@ const Sessions = ({ halls }) => {
     setSessions(transformSeances(data.seances));
   };
 
+  // Обновление сеансов без фильмов //
   const reloadSessions = async () => {
     try {
       const data = await api.getAllData();
@@ -86,8 +89,7 @@ const Sessions = ({ halls }) => {
     }
   };
 
-  // --- effects ---
-
+  // Эффект при загрузке/изменении залов //
   useEffect(() => {
     (async () => {
       try {
@@ -96,11 +98,10 @@ const Sessions = ({ halls }) => {
         console.error('Ошибка при загрузке данных:', e);
       }
     })();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
   }, [halls]);
 
-  // --- movies CRUD ---
-
+  // Удаление фильма //
   const removeMovie = async (id) => {
     try {
       setIsLoading(true);
@@ -125,6 +126,7 @@ const Sessions = ({ halls }) => {
     }
   };
 
+  // Открытие и закрытие формы добавления фильма //
   const openAddMoviePopup = () => {
     setNewMovieData({
       title: '',
@@ -149,6 +151,7 @@ const Sessions = ({ halls }) => {
     });
   };
 
+  // Обработка изменения полей и загрузки постера  //
   const handleAddMovieChange = (field, value) => {
     setNewMovieData(prev => ({ ...prev, [field]: value }));
   };
@@ -168,6 +171,7 @@ const Sessions = ({ halls }) => {
     }
   };
 
+  // Сохранение нового фильма //
   const handleAddMovieSubmit = async () => {
     const title = newMovieData.title.trim();
     const duration = Number(newMovieData.duration);
@@ -184,7 +188,6 @@ const Sessions = ({ halls }) => {
     try {
       setIsLoading(true);
 
-      // ВАЖНО: ключи в camelCase, как требует сервер: filmName, filmDuration, filmDescription, filmOrigin, filePoster
       const formData = new FormData();
       formData.append('filmName', title);
       formData.append('filmDuration', String(duration));
@@ -209,8 +212,7 @@ const Sessions = ({ halls }) => {
     }
   };
 
-  // --- drag & drop: adding session by dropping movie on timeline ---
-
+  // Перетаскивание фильма на таймлайн //
   const onDragStart = (movie) => setDraggedMovie(movie);
 
   const onDrop = (hall) => {
@@ -219,8 +221,7 @@ const Sessions = ({ halls }) => {
     setDraggedMovie(null);
   };
 
-  // --- sessions CRUD / drag-delete ---
-
+  // Перетаскивание сеанса и удаление через "корзину" //
   const onSessionDragStart = (hall, idx) => (e) => {
     setDraggedSession({ hall, idx });
     e.dataTransfer.effectAllowed = 'move';
@@ -270,11 +271,11 @@ const Sessions = ({ halls }) => {
     } finally {
       setDraggedSession(null);
       setIsLoading(false);
-      // Небольшая задержка не обязательна; просто синхронизируемся с сервером
       reloadSessions();
     }
   };
 
+  // Добавление сеанса через попап //
   const onPopupSubmit = async () => {
     const { movieId, hall, time } = popupData;
     if (!time) {
@@ -296,11 +297,11 @@ const Sessions = ({ halls }) => {
         seanceTime: time
       });
 
-      // добавить локально
+      // добавить локально //
       setSessions(prev => {
         const hallSessions = [...(prev[hall] || [])];
         hallSessions.push({
-          id: result?.id ?? `${hall}-${movieId}-${time}`, // на случай если сервер не вернул id
+          id: result?.id ?? `${hall}-${movieId}-${time}`, // на случай если сервер не вернул id //
           movieId: Number(movieId),
           start: time
         });
@@ -319,75 +320,73 @@ const Sessions = ({ halls }) => {
 
   const onPopupClose = () => setPopupData({ visible: false, movieId: null, hall: '', time: '' });
 
+  // Сохранение и отмена всех изменений //
   const handleCancel = async () => {
-  if (isLoading) return;
-  try {
-    setIsLoading(true);
-    // Перечитываем данные с сервера
-    await loadAllData();
+    if (isLoading) return;
+    try {
+      setIsLoading(true);
+      // Перечитываем данные с сервера //
+      await loadAllData();
 
-    // Закрываем попапы и чистим временные стейты
-    setPopupData({ visible: false, movieId: null, hall: '', time: '' });
-    setAddMoviePopupVisible(false);
-    setNewMovieData({
-      title: '',
-      duration: '',
-      description: '',
-      country: '',
-      color: '#ffffff',
-      posterFile: null
-    });
-  } catch (error) {
-    console.error('Ошибка при отмене:', error);
-    alert('Не удалось отменить изменения: ' + error.message);
-  } finally {
-    setIsLoading(false);
-  }
-};
-
-
-  // Добавьте это рядом с другими хендлерами, перед // --- render ---
-const handleSave = async () => {
-  if (isLoading) return;
-  try {
-    setIsLoading(true);
-    // Если нет черновиков — просто синхронизируемся с сервером
-    await reloadSessions();
-    alert('Изменения сохранены.');
-  } catch (e) {
-    console.error('Ошибка при сохранении:', e);
-    alert('Не удалось сохранить изменения: ' + e.message);
-  } finally {
-    setIsLoading(false);
-  }
-};
+      // Закрываем попапы и чистим временные states //
+      setPopupData({ visible: false, movieId: null, hall: '', time: '' });
+      setAddMoviePopupVisible(false);
+      setNewMovieData({
+        title: '',
+        duration: '',
+        description: '',
+        country: '',
+        color: '#ffffff',
+        posterFile: null
+      });
+    } catch (error) {
+      console.error('Ошибка при отмене:', error);
+      alert('Не удалось отменить изменения: ' + error.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
 
+  const handleSave = async () => {
+    if (isLoading) return;
+    try {
+      setIsLoading(true);
+      await reloadSessions();
+      alert('Изменения сохранены.');
+    } catch (e) {
+      console.error('Ошибка при сохранении:', e);
+      alert('Не удалось сохранить изменения: ' + e.message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
-  
-
-
-  // --- render ---
 
   return (
     <section className="sessions-wrapper">
+      {/* Заголовок */}
       <AccordionHeader
         title="СЕТКА СЕАНСОВ"
         isOpen={isOpen}
         toggleOpen={toggleOpen}
       />
 
+      {/* Вертикальная линия */}
       <div className="vertical-line-container">
         <div className="vertical-line top-part"></div>
         <div className="vertical-line bottom-part"></div>
       </div>
 
+      {/* Контент — если аккордеон открыт */}
       {isOpen && (
         <div className="sessions-content">
+          {/* Кнопка добавления фильма */}
           <button className="add-movie-btn" onClick={openAddMoviePopup} disabled={isLoading}>
             {isLoading ? 'ЗАГРУЗКА...' : 'ДОБАВИТЬ ФИЛЬМ'}
           </button>
 
+          {/* Список фильмов (карточки) */}
           <div className="movies-list">
             {movies.map(movie => (
               <div
@@ -418,6 +417,7 @@ const handleSave = async () => {
             ))}
           </div>
 
+          {/* Таймлайны по каждому залу */}
           {halls.map(({ hall_name, id }) => {
             const shows = sessions[hall_name] || [];
 
@@ -500,6 +500,7 @@ const handleSave = async () => {
             );
           })}
 
+          {/* Кнопки сохранения / отмены */}
           <div className="buttons-row">
             <button
               className="btn cancel-btn"
@@ -509,17 +510,18 @@ const handleSave = async () => {
               ОТМЕНА
             </button>
             <button
-  className="btn save-btn"
-  onClick={handleSave}
-  disabled={isLoading}
->
-  {isLoading ? 'СОХРАНЕНИЕ...' : 'СОХРАНИТЬ'}
-</button>
+              className="btn save-btn"
+              onClick={handleSave}
+              disabled={isLoading}
+            >
+              {isLoading ? 'СОХРАНЕНИЕ...' : 'СОХРАНИТЬ'}
+            </button>
 
           </div>
         </div>
       )}
 
+      {/* Попап для добавления сеанса */}
       <Popup
         visible={popupData.visible}
         title="ДОБАВЛЕНИЕ СЕАНСА"
@@ -565,6 +567,7 @@ const handleSave = async () => {
         onClose={onPopupClose}
       />
 
+      {/* Попап для добавления фильма */}
       <Popup
         visible={addMoviePopupVisible}
         title="ДОБАВЛЕНИЕ ФИЛЬМА"

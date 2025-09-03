@@ -34,12 +34,12 @@ const ETicket = ({ movie, seats, hall, startTime }) => {
   const qrValue = `Фильм: ${movie}\nМеста: ${seatText}\nЗал: ${hall}\nНачало сеанса: ${startTime}`;
 
   return (
-    <div className="ticket-wrapper"> {/* Обёртка для центрирования или фона */}
+    <div className="ticket-wrapper"> {/* Обёртка для перфорации */}
 
       <div className="ticket-container"> {/* Основной блок билета */}
         <h3 className="ticket-title">ЭЛЕКТРОННЫЙ БИЛЕТ</h3>
 
-        {/* Стилизованный разделитель — линия или точки */}
+        {/* Стилизованный разделитель — кружочки */}
         <div className="dots-separator-container">
           <div className="dots-separator" />
         </div>

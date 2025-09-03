@@ -1,12 +1,7 @@
-// Импорт необходимых модулей и компонентов React
 import React, { useState } from 'react';
-// Импорт иконки корзины для удаления
-import trash from '../../assets/icons/trash.png';
-// Импорт компонента заголовка аккордеона
+import trash from '../../assets/icons/trash.png'; // Импорт иконки корзины для удаления //
 import AccordionHeader from './AccordionHeader';
-// Импорт компонента всплывающего окна
-import Popup from './Popup';
-// Импорт CSS стилей для компонента
+import Popup from './Popup'; // Импорт компонента всплывающего окна //
 import '../styles/ManageHalls.css';
 
 // Основной компонент для управления кинозалами
@@ -20,13 +15,13 @@ const ManageHalls = ({ halls, onAddHall, onDeleteHall }) => {
 
   // Функция переключения состояния аккордеона
   const toggleOpen = () => setIsOpen(!isOpen);
-  
+
   // Функция открытия всплывающего окна
   const openPopup = () => {
     setNewHallName(''); // Очищаем поле ввода
     setPopupVisible(true); // Показываем попап
   };
-  
+
   // Функция закрытия всплывающего окна
   const closePopup = () => {
     setPopupVisible(false); // Скрываем попап
@@ -46,7 +41,7 @@ const ManageHalls = ({ halls, onAddHall, onDeleteHall }) => {
     closePopup(); // Закрываем попап после добавления
   };
 
-  // Рендеринг компонента
+
   return (
     <section className="manage-halls">
       {/* Компонент заголовка аккордеона с обработчиком клика */}
@@ -56,7 +51,7 @@ const ManageHalls = ({ halls, onAddHall, onDeleteHall }) => {
         toggleOpen={toggleOpen}
       />
 
-      {/* Визуальный разделитель */}
+      {/* Вертикальная линия */}
       <div className="vertical-line"></div>
 
       {/* Условный рендеринг содержимого аккордеона */}
@@ -114,5 +109,5 @@ const ManageHalls = ({ halls, onAddHall, onDeleteHall }) => {
   );
 };
 
-// Экспорт компонента для использования в других частях приложения
+
 export default ManageHalls;

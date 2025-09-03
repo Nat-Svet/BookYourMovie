@@ -1,9 +1,9 @@
 import React, { useEffect, useState } from "react"; //импорт нужных модулей react //
 import { useLocation, useParams } from "react-router-dom"; //импорт хуков для маршрутизации //
 import "bootstrap/dist/css/bootstrap.min.css"; //импорт стилей Bootstrap //
-import "../styles/CinemaHall.css"; // стили //
+import "../styles/CinemaHall.css";
 
-//основной компонент кинозала //
+
 export default function CinemaHall({
   seanceId: propSeanceId, // ID сеанса из пропсов //
   sessionDate: propSessionDate, // Дата сеанса из пропсов //
@@ -24,7 +24,7 @@ export default function CinemaHall({
 
   // Загружаем данные о конфигурации зала и ценах //
   useEffect(() => {
-    
+
     let ignore = false; // Не обновляем состояние, если компонент больше не на экране //
 
     // Асинхронная функция загрузки данных //
@@ -39,7 +39,7 @@ export default function CinemaHall({
         setLoading(true);
         setError(null);
 
-         // 1) Загружаем конфигурацию зала //
+        // 1) Загружаем конфигурацию зала //
         const res = await fetch(
           `https://shfe-diplom.neto-server.ru/hallconfig?seanceId=${seanceId}&date=${sessionDate}`
         );
@@ -72,7 +72,7 @@ export default function CinemaHall({
           setVipPrice(foundHall.hall_price_vip);
         }
       } catch (e) {
-         // Обработка ошибок //
+        // Обработка ошибок //
         if (!ignore) setError(e.message || "Ошибка загрузки схемы зала");
       } finally {
         // Завершение загрузки //
@@ -109,14 +109,14 @@ export default function CinemaHall({
     onSelectionChange?.(selectedSeats, totalPrice);
   }, [selected, seatMap, standardPrice, vipPrice, onSelectionChange]);
 
-   // Обработчик выбора места //
+  // Обработчик выбора места //
   function handleSelect(row, col) {
     const type = seatMap?.[row]?.[col];
     // Игнорируем клики на заблокированные или занятые места //
     if (type === "disabled" || type === "taken") return;
     // Формирование ID места //
     const id = `${row}-${col}`;
-     // Добавляем или удаляем места из выбранных //
+    // Добавляем или удаляем места из выбранных //
     setSelected((prev) => (prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]));
   }
 
@@ -138,28 +138,28 @@ export default function CinemaHall({
     );
   }
 
-   // Основной рендеринг компонента //
+  // Основной рендеринг компонента //
   return (
     <div className="container py-3 bg-dark text-white cinema-hall-container">
       <div className="row justify-content-center mb-3"> {/* Блок экрана */}
         <div className="col-auto screen text-center">Экран</div>
       </div>
 
- {/* Рендеринг рядов и мест */}
+      {/* Рендеринг рядов и мест */}
       {seatMap.map((row, rowIndex) => (
         <div key={rowIndex} className="row justify-content-center seat-row">
           {row.map((seatType, seatIndex) => {
-             // Пропуск отключенных мест //
+            // Пропуск отключенных мест //
             if (seatType === "disabled") {
               return <div key={seatIndex} className="col-auto seat empty-seat" />;
             }
 
-             // Формирование ID места //
+            // Формирование ID места //
             const seatId = `${rowIndex}-${seatIndex}`;
-             // Определение классов для кнопки места //
+            // Определение классов для кнопки места //
             let seatClass = "seat btn btn-sm rounded-0";
 
-             // Добавление классов в зависимости от типа места //
+            // Добавление классов в зависимости от типа места //
             if (seatType === "vip") seatClass += " vip-seat";
             else if (seatType === "taken") seatClass += " busy-seat";
             else seatClass += " btn-light free-seat";
@@ -169,7 +169,7 @@ export default function CinemaHall({
               seatClass = "seat btn btn-sm rounded-0 btn-info selected-seat";
             }
 
-             // Рендеринг кнопки места //
+            // Рендеринг кнопки места //
             return (
               <div key={seatIndex} className="col-auto p-0">
                 <button
@@ -177,7 +177,7 @@ export default function CinemaHall({
                   onClick={() => handleSelect(rowIndex, seatIndex)}
                   title={`Ряд ${rowIndex + 1}, место ${seatIndex + 1}`}
                   type="button"
-                  disabled={seatType === "taken"} // Блокировка занятых мест //
+                  disabled={seatType === "taken"} // Блокировка занятых мест  //
                 >
                   {/*{seatIndex + 1}  Отображение номера места */}
                 </button>
@@ -187,7 +187,7 @@ export default function CinemaHall({
         </div>
       ))}
 
-       {/* Легенда для пояснения цветов мест */}
+      {/* Легенда для пояснения цветов мест */}
       <div className="legend d-flex justify-content-center gap-2 mt-4">
         <div className="legend-column d-flex flex-column gap-3">
           <div className="legend-item d-flex align-items-center gap-2">
