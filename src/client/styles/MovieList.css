@@ -67,6 +67,15 @@ body,
     height: 48px;
     width: auto !important;
   }
+
+.movie-list-header {
+  padding: 0 10px;
+}
+
+  .movie-list-header h1 {
+margin: 0;
+  }
+
 }
 
 
