@@ -13,6 +13,39 @@ export default function SeatSelection() {
   const location = useLocation(); // получаем данные, переданные через navigate(..., {state}) //
   const params = useParams(); // получаем параметры из URL (например seanceId) //
   const navigate = useNavigate(); // функция для перехода по другим страницам //
+const [isMobileOrTablet, setIsMobileOrTablet] = useState(false); // Состояние для определения типа устройства //
+
+// Определяем тип устройства при монтировании и изменении размера окна
+  useEffect(() => {
+  const handleResize = () => {
+    const isMobile = window.innerWidth <= 1199;
+    console.log("Is mobile/tablet:", isMobile, "Width:", window.innerWidth);
+    setIsMobileOrTablet(isMobile);
+  };
+  
+  handleResize();
+  window.addEventListener("resize", handleResize);
+  
+  return () => window.removeEventListener("resize", handleResize);
+}, []);
+
+  //Tooltip //
+  const [zoomed, setZoomed] = useState(false);
+
+  const handleTooltipTap = useCallback(() => {
+  console.log("handleTooltipTap вызван");
+  setZoomed(prev => {
+    const newValue = !prev;
+    console.log("Zoom changed to:", newValue);
+    return newValue;
+  });
+}, []);
+
+  function handleCinemaZoomChange(newState) {
+    setZoomed(newState);
+  }
+
+
 
   // Состояние с данными о фильме и сеансе //
   const [seanceData, setSeanceData] = useState({
@@ -78,24 +111,33 @@ export default function SeatSelection() {
             />
           </div>
 
-          {/* Зал с местами + подсказка (tooltip) */}
-          <div className="cinema-hall-row position-relative">
-            <CinemaHall
-              seanceId={location.state?.seanceId || params.seanceId}
-              sessionDate={
-                location.state?.sessionDate || new Date().toISOString().split("T")[0]
-              }
-              onSelectionChange={handleSeatSelection}
-            />
-            <Tooltip />
-          </div>
+           {/* Зал с местами + подсказка (tooltip) */}
+        <div className="cinema-hall-row position-relative">
+          <CinemaHall
+            seanceId={location.state?.seanceId || params.seanceId}
+            sessionDate={
+              location.state?.sessionDate || new Date().toISOString().split("T")[0]
+            }
+            onSelectionChange={handleSeatSelection}
+            zoomed={zoomed}
+            isMobileOrTablet={isMobileOrTablet} // Передаем информацию об устройстве
+          />
 
-          {/* Кнопка бронирования */}
-          <div className="button-row">
-            <Button onClick={handleBook} disabled={selectedSeats.length === 0}>
-              Забронировать
-            </Button>
-          </div>
+          {/* Показываем Tooltip только на мобильных устройствах и планшетах */}
+          {isMobileOrTablet && (
+  <Tooltip onDoubleTap={handleTooltipTap} />
+)}
+        </div>
+
+{/* Кнопка бронирования */}
+            <div className="button-row">
+              
+              <Button onClick={handleBook} disabled={selectedSeats.length === 0}>
+                Забронировать
+              </Button>
+
+            </div>
+
         </main>
       </div>
     </Layout>
