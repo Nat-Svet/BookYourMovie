@@ -4,37 +4,119 @@ import AccordionHeader from './AccordionHeader';
 import '../styles/ConfigHalls.css';
 import API from '../../api/api';
 
-// Создание экземпляра API
 const api = new API();
 
-// Основной компонент для конфигурации залов
 const ConfigHalls = ({ halls }) => {
-  // Состояние для отслеживания открыто/закрыто аккордеона
   const [isOpen, setIsOpen] = useState(true);
-  // Состояние для хранения выбранного зала
   const [selectedHall, setSelectedHall] = useState(halls.length > 0 ? halls[0].hall_name : '');
-  // Состояние для количества рядов
-  const [rows, setRows] = useState(10);
-  // Состояние для количества мест в ряду
-  const [seatsPerRow, setSeatsPerRow] = useState(8);
-  // Состояние для типов мест (0 - обычное, 1 - VIP, 2 - заблокированное)
-  const [seatTypes, setSeatTypes] = useState(
-    Array(rows).fill(null).map(() => Array(seatsPerRow).fill(0))
-  );
-  // Состояние для отображения статуса загрузки
+  const [rowsInput, setRowsInput] = useState("10");
+  const [seatsInput, setSeatsInput] = useState("8");
+  const [seatTypes, setSeatTypes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [loadedFromServer, setLoadedFromServer] = useState(false);
+  const [hallConfigs, setHallConfigs] = useState({}); 
+  // { hallId: { rows, seats, seatTypes } }
 
-  // Функция переключения состояния аккордеона
+  const rows = parseInt(rowsInput, 10) || 1;
+  const seatsPerRow = parseInt(seatsInput, 10) || 1;
+
   const toggleOpen = () => setIsOpen(!isOpen);
 
-  // Эффект для обновления схемы мест при изменении количества рядов или мест
+  // Загружаем конфигурацию при переключении зала
   useEffect(() => {
-    setSeatTypes(
-      Array(rows).fill(null).map(() => Array(seatsPerRow).fill(0))
-    );
-  }, [rows, seatsPerRow]);
+    const fetchHallConfig = async () => {
+      const hall = halls.find(h => h.hall_name === selectedHall);
+      if (!hall) return;
 
-  // Функция изменения типа места при клике
+      setIsLoading(true);
+      try {
+        // если есть в кеше
+        if (hallConfigs[hall.id]) {
+          const cfg = hallConfigs[hall.id];
+          setRowsInput(cfg.rows.toString());
+          setSeatsInput(cfg.seats.toString());
+          setSeatTypes(cfg.seatTypes);
+          setLoadedFromServer(true);
+          return;
+        }
+
+        // грузим с сервера
+        const allData = await api.getAllData();
+        const hallData = allData.halls.find(h => h.id === hall.id);
+
+        if (hallData && hallData.hall_config) {
+          const config = hallData.hall_config; // уже массив
+          const rowCount = parseInt(hallData.hall_rows, 10) || config.length;
+          const placeCount = parseInt(hallData.hall_places, 10) || (config[0]?.length || 0);
+
+          const seatTypesFromServer = config.map(row =>
+            row.map(seat => {
+              switch (seat) {
+                case 'standart': return 0;
+                case 'vip': return 1;
+                case 'disabled': return 2;
+                default: return 0;
+              }
+            })
+          );
+
+          setRowsInput(rowCount.toString());
+          setSeatsInput(placeCount.toString());
+          setSeatTypes(seatTypesFromServer);
+
+          // кешируем
+          setHallConfigs(prev => ({
+            ...prev,
+            [hall.id]: { rows: rowCount, seats: placeCount, seatTypes: seatTypesFromServer }
+          }));
+
+          setLoadedFromServer(true);
+        } else {
+          // дефолт
+          setRowsInput("10");
+          setSeatsInput("8");
+          setSeatTypes(Array(10).fill(null).map(() => Array(8).fill(0)));
+          setLoadedFromServer(false);
+        }
+      } catch (error) {
+        console.error('Ошибка при загрузке конфигурации зала:', error);
+        alert('Ошибка при загрузке конфигурации зала: ' + error.message);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchHallConfig();
+  }, [selectedHall, halls, hallConfigs]);
+
+  // Если меняем ряды/места вручную
+  useEffect(() => {
+    if (!loadedFromServer) {
+      setSeatTypes(
+        Array(rows).fill(null).map(() => Array(seatsPerRow).fill(0))
+      );
+    }
+  }, [rows, seatsPerRow, loadedFromServer]);
+
+  const onRowsChange = e => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {
+      setRowsInput(value);
+      setIsSaved(false);
+      setLoadedFromServer(false);
+    }
+  };
+
+  const onSeatsChange = e => {
+    const value = e.target.value;
+    if (/^\d*$/.test(value)) {
+      setSeatsInput(value);
+      setIsSaved(false);
+      setLoadedFromServer(false);
+    }
+  };
+
   const toggleSeatType = (rowIndex, seatIndex) => {
     setSeatTypes(prev => {
       const newSeatTypes = prev.map(r => [...r]);
@@ -42,30 +124,11 @@ const ConfigHalls = ({ halls }) => {
       newSeatTypes[rowIndex][seatIndex] = (currentType + 1) % 3;
       return newSeatTypes;
     });
+    setIsSaved(false);
+    setLoadedFromServer(false);
   };
 
-  // Обработчик изменения количества рядов
-  const onRowsChange = e => {
-    const value = Number(e.target.value);
-    if (value > 0) setRows(value);
-  };
-
-  // Обработчик изменения количества мест в ряду
-  const onSeatsChange = e => {
-    const value = Number(e.target.value);
-    if (value > 0) setSeatsPerRow(value);
-  };
-
-  // Эффект для обновления выбранного зала при изменении списка залов
-  useEffect(() => {
-    if (halls.length > 0 && !halls.find(h => h.hall_name === selectedHall)) {
-      setSelectedHall(halls[0].hall_name);
-    }
-  }, [halls, selectedHall]);
-
-  // Функция для сохранения конфигурации зала
   const handleSave = async () => {
-    // Находим ID выбранного зала
     const hall = halls.find(h => h.hall_name === selectedHall);
     if (!hall) {
       alert('Зал не найден');
@@ -73,9 +136,7 @@ const ConfigHalls = ({ halls }) => {
     }
 
     setIsLoading(true);
-
     try {
-      // Преобразуем числовые типы мест в строковые согласно API
       const config = seatTypes.map(row =>
         row.map(seatType => {
           switch (seatType) {
@@ -87,21 +148,30 @@ const ConfigHalls = ({ halls }) => {
         })
       );
 
-      // Подготавливаем данные для отправки
       const payload = {
         rowCount: rows,
         placeCount: seatsPerRow,
         config: JSON.stringify(config)
       };
 
-      // Отправляем запрос на сервер
+      console.log("Отправляем payload:", payload);
+
       const result = await api.request(`/hall/${hall.id}`, {
         method: 'POST',
         body: payload
       });
 
-      console.log('Конфигурация зала успешно сохранена:', result);
+      console.log("Ответ сервера:", result);
+
+      // обновляем кеш
+      setHallConfigs(prev => ({
+        ...prev,
+        [hall.id]: { rows, seats: seatsPerRow, seatTypes }
+      }));
+
+      setIsSaved(true);
       alert('Конфигурация зала успешно сохранена!');
+      setLoadedFromServer(true);
     } catch (error) {
       console.error('Ошибка при сохранении конфигурации зала:', error);
       alert('Ошибка при сохранении конфигурации зала: ' + error.message);
@@ -110,34 +180,34 @@ const ConfigHalls = ({ halls }) => {
     }
   };
 
-  // Функция для отмены изменений
-  const handleCancel = () => {
-    // Сброс состояний к исходным значениям
-    setRows(10);
-    setSeatsPerRow(8);
-    setSeatTypes(Array(10).fill(null).map(() => Array(8).fill(0)));
+  const handleHallSelect = (hallName) => {
+    setSelectedHall(hallName);
+    setIsSaved(false);
   };
 
-  // Рендеринг компонента
+  const handleCancel = () => {
+    setRowsInput("10");
+    setSeatsInput("8");
+    setSeatTypes(Array(10).fill(null).map(() => Array(8).fill(0)));
+    setIsSaved(false);
+    setLoadedFromServer(false);
+  };
+
   return (
     <section className="config-hall">
-      {/* Заголовок аккордеона */}
       <AccordionHeader
         title="КОНФИГУРАЦИЯ ЗАЛОВ"
         isOpen={isOpen}
         toggleOpen={toggleOpen}
       />
 
-      {/* Вертикальная линия */}
       <div className="vertical-line-container">
         <div className="vertical-line top-part"></div>
         <div className="vertical-line bottom-part"></div>
       </div>
 
-      {/* Условный рендеринг содержимого аккордеона */}
       {isOpen && (
         <div className="config-hall-content">
-          {/* Выбор зала для конфигурации */}
           <div className="config-hall-select">
             <span className="config-hall-select-label">Выберите зал для конфигурации:</span>
             <div className="config-hall-select-buttons">
@@ -145,7 +215,7 @@ const ConfigHalls = ({ halls }) => {
                 <button
                   key={hall.id}
                   className={`config-hall-select-btn ${selectedHall === hall.hall_name ? 'active' : ''}`}
-                  onClick={() => setSelectedHall(hall.hall_name)}
+                  onClick={() => handleHallSelect(hall.hall_name)}
                 >
                   {hall.hall_name}
                 </button>
@@ -153,7 +223,6 @@ const ConfigHalls = ({ halls }) => {
             </div>
           </div>
 
-          {/* Настройка количества рядов и мест */}
           <div className="config-hall-rows-seats">
             <p className="config-hall-instruction">
               Укажите количество рядов и максимальное количество кресел в ряду:
@@ -162,60 +231,69 @@ const ConfigHalls = ({ halls }) => {
             <div className="config-hall-inputs">
               <label>
                 Рядов, шт
-                <input type="number" min="1" value={rows} onChange={onRowsChange} />
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={rowsInput}
+                  onChange={onRowsChange}
+                />
               </label>
               <span className="multiply">×</span>
               <label>
                 Мест, шт
-                <input type="number" min="1" value={seatsPerRow} onChange={onSeatsChange} />
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  pattern="[0-9]*"
+                  value={seatsInput}
+                  onChange={onSeatsChange}
+                />
               </label>
             </div>
           </div>
 
-          {/* Инструкция по настройке типов кресел */}
           <p className="config-hall-instruction">
             Теперь вы можете указать типы кресел на схеме зала:
           </p>
 
-          {/* Легенда типов мест */}
           <div className="config-hall-legend">
             <div><span className="legend-box seat-normal" /> — обычные кресла</div>
             <div><span className="legend-box seat-vip" /> — VIP кресла</div>
             <div><span className="legend-box seat-blocked" /> — заблокированные (нет кресла)</div>
           </div>
 
-          {/* Подсказка по взаимодействию */}
           <div className="config-hall-instruction-hint">
             Чтобы изменить вид кресла, нажмите по нему левой кнопкой мыши
           </div>
 
-          {/* Визуализация схемы зала */}
           <div className="config-hall-seats">
             <div className="screen-label">Э К Р А Н</div>
-            <div className="seats-grid">
-              {seatTypes.map((row, rowIndex) => (
-                <div key={rowIndex} className="d-flex justify-content-center mb-2 seat-row">
-                  {row.map((seatType, seatIndex) => {
-                    const seatClass =
-                      seatType === 0 ? 'seat-normal'
-                        : seatType === 1 ? 'seat-vip'
-                          : 'seat-blocked';
+            <div className="seats-grid-wrapper">
+              <div className="seats-grid">
+                {seatTypes.map((row, rowIndex) => (
+                  <div key={rowIndex} className="d-flex justify-content-center mb-2 seat-row">
+                    {row.map((seatType, seatIndex) => {
+                      const seatClass =
+                        seatType === 0 ? 'seat-normal'
+                          : seatType === 1 ? 'seat-vip'
+                            : 'seat-blocked';
 
-                    return (
-                      <div
-                        key={seatIndex}
-                        className={`seat ${seatClass} flex-shrink-0 mx-1`}
-                        onClick={() => toggleSeatType(rowIndex, seatIndex)}
-                        title={`Ряд ${rowIndex + 1}, место ${seatIndex + 1}`}
-                      />
-                    );
-                  })}
-                </div>
-              ))}
+                      return (
+                        <div
+                          key={seatIndex}
+                          className={`seat ${seatClass} flex-shrink-0 mx-1`}
+                          onClick={() => toggleSeatType(rowIndex, seatIndex)}
+                          title={`Ряд ${rowIndex + 1}, место ${seatIndex + 1}`}
+                        />
+                      );
+                    })}
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
-          {/* Кнопки действий */}
           <div className="config-hall-buttons">
             <button
               className="btn btn-cancel"
@@ -229,7 +307,11 @@ const ConfigHalls = ({ halls }) => {
               onClick={handleSave}
               disabled={isLoading}
             >
-              {isLoading ? 'СОХРАНЕНИЕ...' : 'СОХРАНИТЬ'}
+              {isLoading
+                ? 'СОХРАНЕНИЕ...'
+                : isSaved
+                  ? 'СОХРАНЕНО!'
+                  : 'СОХРАНИТЬ'}
             </button>
           </div>
         </div>
@@ -237,6 +319,5 @@ const ConfigHalls = ({ halls }) => {
     </section>
   );
 };
-
 
 export default ConfigHalls;

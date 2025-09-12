@@ -54,3 +54,17 @@
 .accordion-toggle-img.open {
     transform: rotate(0deg);
 }
+
+/* --Адаптивность --*/
+
+@media (max-width: 360px) {
+.accordion-title {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 320px) {
+.accordion-title {
+        font-size: 15px;
+    }
+}

@@ -1,9 +1,13 @@
 .config-hall {
-    width: 962px;
+    max-width: 962px;
+    width: 100%;
     background-color: #EAE9EB;
     opacity: 0.95;
     position: relative;
+    padding: 0 10px;
+    box-sizing: border-box;
 }
+
 
 /* Аккордион импортирован в ManageHalls.jsx, как компонент */
 
@@ -32,8 +36,8 @@
 .config-hall-select-buttons {
     margin-top: 10px;
     display: flex;
-    gap: 0;
-
+    gap: 10px 0px;
+    flex-wrap: wrap;
 }
 
 /* обычная кнопка */
@@ -52,7 +56,6 @@
     background: rgba(255, 255, 255, 0.45);
     color: #000000;
     margin-left: 0;
-
 }
 
 /*активная кнопка */
@@ -220,8 +223,10 @@
 }
 
 .seats-grid {
-    display: flex;
-    flex-direction: column;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: top center;
 }
 
 .seat-row {
@@ -325,3 +330,65 @@
     height: 28px;
     /* от верха блока до верхней границы маркера */
 }
+
+.seats-grid-wrapper {
+  overflow-x: auto;
+  max-width: 100%;
+  padding-bottom: 8px; /* чтобы скроллбар не перекрывал места */
+}
+
+
+/* --Адптивность-- */
+
+@media (max-width: 768px) {
+  .config-hall-inputs {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 10px;
+    flex-wrap: nowrap;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .config-hall-inputs label {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .config-hall-inputs input {
+    width: 100%;
+  }
+
+  .multiply {
+    font-size: 18px;
+    line-height: 36px;
+    color: #848484;
+    user-select: none;
+    text-align: center;
+    padding: 0 8px;
+    margin: 0;
+    flex-shrink: 0;
+  }
+
+  .config-hall-legend {
+  font-size: 14px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px 30px;
+  color: #848484;
+}
+
+.config-hall-legend > div {
+  white-space: nowrap; /* Ключевой стиль */
+  display: flex;
+  align-items: center;
+}
+
+.seats-grid {
+    transform: scale(0.9);
+    min-width: max-content; /* чтобы не схлопывалась при scale */
+  }
+
+}
+

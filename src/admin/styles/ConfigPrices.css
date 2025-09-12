@@ -33,8 +33,11 @@
 .config-prices-select-buttons {
     margin-top: 10px;
     display: flex;
-    gap: 0;
+    gap: 10px 0px;
+    flex-wrap: wrap;
 }
+
+
 
 /*обычная кнопка */
 .config-prices-select-btn {
@@ -225,4 +228,17 @@
 .btn-save:hover {
     background-color: #147474;
     color: #FFFFFF;
+}
+
+/* --Адаптивность-- */
+@media (max-width: 768px) {
+  .config-hall-inputs {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 10px;
+    flex-wrap: nowrap;
+    width: 100%;
+    box-sizing: border-box;
+  }
 }
