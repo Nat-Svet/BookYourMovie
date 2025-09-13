@@ -3,13 +3,13 @@ import AccordionHeader from './AccordionHeader';
 import '../styles/ConfigPrices.css';
 import API from '../../api/api';
 
-const ConfigPrices = ({ halls }) => {
+const ConfigPrices = ({ halls, onUpdateHall }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [selectedHall, setSelectedHall] = useState(halls.length > 0 ? halls[0].hall_name : '');
-  const [normalPrice, setNormalPrice] = useState(0);
-  const [vipPrice, setVipPrice] = useState(350);
+  const [normalPrice, setNormalPrice] = useState('0');
+  const [vipPrice, setVipPrice] = useState('350');
   const [isLoading, setIsLoading] = useState(false);
-  const [isSaved, setIsSaved] = useState(false); // новое состояние
+  const [isSaved, setIsSaved] = useState(false);
 
   const api = new API();
 
@@ -22,19 +22,21 @@ const ConfigPrices = ({ halls }) => {
 
   const toggleOpen = () => setIsOpen(!isOpen);
 
+  // Если выбранный зал удалён → выбрать первый
   useEffect(() => {
     if (!halls.find(h => h.hall_name === selectedHall) && halls.length > 0) {
       setSelectedHall(halls[0].hall_name);
     }
   }, [halls, selectedHall]);
 
+  // При переключении зала подгружаем его цены
   useEffect(() => {
     if (selectedHall && halls.length > 0) {
       const hall = halls.find(h => h.hall_name === selectedHall);
       if (hall) {
-        setNormalPrice(hall.hall_price_standart || 0);
-        setVipPrice(hall.hall_price_vip || 350);
-        setIsSaved(false); // сброс при переключении зала
+        setNormalPrice(String(hall.hall_price_standart || 1));
+        setVipPrice(String(hall.hall_price_vip || 1));
+        setIsSaved(false);
       }
     }
   }, [selectedHall, halls]);
@@ -47,16 +49,25 @@ const ConfigPrices = ({ halls }) => {
       return;
     }
 
+    const priceStandart = normalPrice === '' ? 1 : Math.max(1, Number(normalPrice));
+    const priceVip = vipPrice === '' ? 1 : Math.max(1, Number(vipPrice));
+
     setIsLoading(true);
 
     try {
-      const result = await api.updatePrices(hall.id, {
-        priceStandart: normalPrice,
-        priceVip: vipPrice
+      await api.updatePrices(hall.id, {
+        priceStandart,
+        priceVip
       });
 
-      console.log('Цены успешно обновлены:', result);
-      setIsSaved(true); // переключаем кнопку
+      // ✅ обновляем локально (и в родителе, если передан onUpdateHall)
+      if (onUpdateHall) {
+        onUpdateHall(hall.id, priceStandart, priceVip);
+      }
+
+      setNormalPrice(String(priceStandart));
+      setVipPrice(String(priceVip));
+      setIsSaved(true);
       alert('Цены успешно обновлены!');
     } catch (error) {
       console.error('Ошибка при обновлении цен:', error);
@@ -70,21 +81,21 @@ const ConfigPrices = ({ halls }) => {
   const handleCancel = () => {
     const hall = halls.find(h => h.hall_name === selectedHall);
     if (hall) {
-      setNormalPrice(hall.hall_price_standart || 0);
-      setVipPrice(hall.hall_price_vip || 350);
-      setIsSaved(false); // сброс при отмене
+      setNormalPrice(String(hall.hall_price_standart || 1));
+      setVipPrice(String(hall.hall_price_vip || 1));
+      setIsSaved(false);
     }
   };
 
-  // При изменении цены сбрасываем статус
+  // Обработчики изменения цен (разрешаем пустое поле)
   const handleNormalPriceChange = (e) => {
-    setNormalPrice(Number(e.target.value));
-    setIsSaved(false); // сброс при изменении
+    setNormalPrice(e.target.value);
+    setIsSaved(false);
   };
 
   const handleVipPriceChange = (e) => {
-    setVipPrice(Number(e.target.value));
-    setIsSaved(false); // сброс при изменении
+    setVipPrice(e.target.value);
+    setIsSaved(false);
   };
 
   return (
@@ -128,7 +139,7 @@ const ConfigPrices = ({ halls }) => {
                 <input
                   id="normal-price"
                   type="number"
-                  min="0"
+                  min="1"
                   value={normalPrice}
                   onChange={handleNormalPriceChange}
                   disabled={isLoading}
@@ -147,7 +158,7 @@ const ConfigPrices = ({ halls }) => {
                 <input
                   id="vip-price"
                   type="number"
-                  min="0"
+                  min="1"
                   value={vipPrice}
                   onChange={handleVipPriceChange}
                   disabled={isLoading}

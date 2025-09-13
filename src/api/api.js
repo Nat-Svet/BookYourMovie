@@ -130,9 +130,9 @@ export default class API {
     return this.request(`/seance/${sessionId}`, { method: "DELETE" });
   }
 
-  getHallConfig(hallId) {
-    return this.request(`/hall/${hallId}`, { method: "GET" });
-  }
+  //getHallConfig(hallId) {
+    //return this.request(`/hall/${hallId}`, { method: "GET" });
+//  }
 
   toggleHallOpen(hallId, isOpen) {
     return this.request(`/open/${hallId}`, {
@@ -152,7 +152,7 @@ export default class API {
   }
 
   // Покупка билетов
-  // Покупка билетов (через FormData)
+  
 async buyTicketsClient(seanceId, ticketDate, tickets) {
   const fd = new FormData();
   fd.append("seanceId", seanceId);

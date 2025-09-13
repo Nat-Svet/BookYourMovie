@@ -62,6 +62,17 @@ const AdminPage = () => {
     }
   };
 
+  // 🔑 Обновление цен у конкретного зала в state (без повторного запроса к серверу)
+  const handleUpdateHall = (hallId, priceStandart, priceVip) => {
+    setHalls(prev =>
+      prev.map(h =>
+        h.id === hallId
+          ? { ...h, hall_price_standart: priceStandart, hall_price_vip: priceVip }
+          : h
+      )
+    );
+  };
+
   return (
     <AdminLayout>
       <AdminHeader />
@@ -78,7 +89,8 @@ const AdminPage = () => {
               onDeleteHall={deleteHall}
             />
             <ConfigHalls halls={halls} />
-            <ConfigPrices halls={halls} />
+            {/* ✅ сюда пробрасываем onUpdateHall */}
+            <ConfigPrices halls={halls} onUpdateHall={handleUpdateHall} />
             <Sessions halls={halls} />
             <OpenSale halls={halls} />
           </>
