@@ -1,66 +1,59 @@
 import React, { useEffect, useState, useCallback } from "react";
-import { useLocation, useParams, useNavigate } from "react-router-dom"; // маршрутизация //
+import { useLocation, useParams, useNavigate } from "react-router-dom"; 
 import Layout from "../components/Layout";
 import ClientHeader from "../components/ClientHeader";
 import MovieInfo from "../components/MovieInfo";
 import CinemaHall from "../components/CinemaHall";
 import Button from "../components/Button";
 import Tooltip from "../components/Tooltip";
+import API from "../../api/api";   // ✅ импорт API
 
 import "../styles/SeatSelection.css";
 
+const api = new API();
+
 export default function SeatSelection() {
-  const location = useLocation(); // получаем данные, переданные через navigate(..., {state}) //
-  const params = useParams(); // получаем параметры из URL (например seanceId) //
-  const navigate = useNavigate(); // функция для перехода по другим страницам //
-const [isMobileOrTablet, setIsMobileOrTablet] = useState(false); // Состояние для определения типа устройства //
+  const location = useLocation();
+  const params = useParams();
+  const navigate = useNavigate();
 
-// Определяем тип устройства при монтировании и изменении размера окна
+  const [isMobileOrTablet, setIsMobileOrTablet] = useState(false);
+
   useEffect(() => {
-  const handleResize = () => {
-    const isMobile = window.innerWidth <= 1199;
-    console.log("Is mobile/tablet:", isMobile, "Width:", window.innerWidth);
-    setIsMobileOrTablet(isMobile);
-  };
-  
-  handleResize();
-  window.addEventListener("resize", handleResize);
-  
-  return () => window.removeEventListener("resize", handleResize);
-}, []);
+    const handleResize = () => {
+      const isMobile = window.innerWidth <= 1199;
+      setIsMobileOrTablet(isMobile);
+    };
+    handleResize();
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
-  //Tooltip //
+  // Tooltip (зум)
   const [zoomed, setZoomed] = useState(false);
-
   const handleTooltipTap = useCallback(() => {
-  console.log("handleTooltipTap вызван");
-  setZoomed(prev => {
-    const newValue = !prev;
-    console.log("Zoom changed to:", newValue);
-    return newValue;
-  });
-}, []);
+    setZoomed(prev => !prev);
+  }, []);
 
   function handleCinemaZoomChange(newState) {
     setZoomed(newState);
   }
 
-
-
-  // Состояние с данными о фильме и сеансе //
+  // Состояние фильма и сеанса
   const [seanceData, setSeanceData] = useState({
     filmName: null,
     sessionTime: null,
     hallName: null,
   });
 
-  // Состояние для выбранных мест //
+  // Состояние мест и суммы
   const [selectedSeats, setSelectedSeats] = useState([]);
-  // Состояние для общей суммы бронирования //
   const [totalPrice, setTotalPrice] = useState(0);
+  const [successMessage, setSuccessMessage] = useState("");
 
-  // При первом рендере проверяем, есть ли данные в location.state //
-  // и записываем их в seanceData //
+  // 💰 Цены из CinemaHall
+  const [prices, setPrices] = useState({ normal: 0, vip: 0 });
+
   useEffect(() => {
     if (location.state) {
       const { filmName, sessionTime, hallName } = location.state;
@@ -68,41 +61,63 @@ const [isMobileOrTablet, setIsMobileOrTablet] = useState(false); // Состоя
     }
   }, [location.state]);
 
-  // Функция для обработки выбора мест в зале //
-  // useCallback используется, чтобы ссылка на функцию не менялась на каждом рендере //
   const handleSeatSelection = useCallback((seats, price) => {
-    setSelectedSeats(seats); // сохраняем выбранные места //
-    setTotalPrice(price); // сохраняем общую цену //
+    setSelectedSeats(seats);
+    setTotalPrice(price);
   }, []);
 
-  // Функция бронирования (нажатие кнопки "Забронировать") //
-  const handleBook = () => {
-    if (selectedSeats.length === 0) return; // если мест не выбрано, ничего не делаем //
-    // переходим на страницу оплаты и передаём туда данные //
-    navigate("/payment", {
-      state: {
-        filmName: seanceData.filmName,
-        sessionTime: seanceData.sessionTime,
-        hallName: seanceData.hallName,
-        seats: selectedSeats,
-        price: totalPrice,
-      },
-    });
+  // ✅ Бронирование с запросом на сервер
+  const handleBook = async () => {
+    if (selectedSeats.length === 0) return;
+
+    try {
+      const seanceId = location.state?.seanceId || params.seanceId;
+      const ticketDate =
+        location.state?.sessionDate || new Date().toISOString().split("T")[0];
+
+      const tickets = selectedSeats.map((seat) => ({
+        row: Number(seat.row),
+        place: Number(seat.seat),
+        coast: Number(seat.type === "vip" ? prices.vip : prices.normal),
+      }));
+
+      const payload = { seanceId, ticketDate, tickets };
+
+      console.log("Выбранные места (selectedSeats):", selectedSeats);
+      console.log("📤 Отправляем бронь (payload):", JSON.stringify(payload, null, 2));
+
+      const response = await api.buyTicketsClient(seanceId, ticketDate, tickets);
+
+      console.log("✅ Ответ от сервера:", response);
+
+      setSuccessMessage("✅ Билеты успешно забронированы!");
+
+      // Переход на страницу оплаты
+      navigate("/payment", {
+        state: {
+          filmName: seanceData.filmName,
+          sessionTime: seanceData.sessionTime,
+          hallName: seanceData.hallName,
+          seats: selectedSeats,
+          price: totalPrice,
+        },
+      });
+    } catch (error) {
+      console.error("❌ Ошибка бронирования:", error);
+      alert("Не удалось забронировать места: " + error.message);
+    }
   };
 
-  // Основной JSX //
   return (
     <Layout>
       <div className="seat-selection-page">
-
-        {/* хэддер */}
+        {/* Хэддер */}
         <div className="client-header">
           <ClientHeader />
         </div>
 
         <main className="content">
-
-          {/* Блок с информацией о фильме и сеансе */}
+          {/* Инфо о фильме */}
           <div className="movie-info-row">
             <MovieInfo
               filmName={seanceData.filmName}
@@ -111,33 +126,35 @@ const [isMobileOrTablet, setIsMobileOrTablet] = useState(false); // Состоя
             />
           </div>
 
-           {/* Зал с местами + подсказка (tooltip) */}
-        <div className="cinema-hall-row position-relative">
-          <CinemaHall
-            seanceId={location.state?.seanceId || params.seanceId}
-            sessionDate={
-              location.state?.sessionDate || new Date().toISOString().split("T")[0]
-            }
-            onSelectionChange={handleSeatSelection}
-            zoomed={zoomed}
-            isMobileOrTablet={isMobileOrTablet} // Передаем информацию об устройстве
-          />
+          {/* Зал + Tooltip */}
+          <div className="cinema-hall-row position-relative">
+            <CinemaHall
+              seanceId={location.state?.seanceId || params.seanceId}
+              sessionDate={
+                location.state?.sessionDate ||
+                new Date().toISOString().split("T")[0]
+              }
+              onSelectionChange={handleSeatSelection}
+              onPricesLoad={setPrices}
+              zoomed={zoomed}
+              isMobileOrTablet={isMobileOrTablet}
+            />
 
-          {/* Показываем Tooltip только на мобильных устройствах и планшетах */}
-          {isMobileOrTablet && (
-  <Tooltip onDoubleTap={handleTooltipTap} />
-)}
-        </div>
+            {isMobileOrTablet && <Tooltip onDoubleTap={handleTooltipTap} />}
+          </div>
 
-{/* Кнопка бронирования */}
-            <div className="button-row">
-              
-              <Button onClick={handleBook} disabled={selectedSeats.length === 0}>
-                Забронировать
-              </Button>
+          {/* Кнопка брони */}
+          <div className="button-row">
+            <Button onClick={handleBook} disabled={selectedSeats.length === 0}>
+              Забронировать
+            </Button>
 
-            </div>
-
+            {successMessage && (
+              <div className="text-success text-center mt-3 fw-bold">
+                {successMessage}
+              </div>
+            )}
+          </div>
         </main>
       </div>
     </Layout>

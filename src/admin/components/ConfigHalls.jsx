@@ -1,3 +1,4 @@
+// ConfigHalls.js
 import React, { useState, useEffect } from 'react';
 import "bootstrap/dist/css/bootstrap.min.css";
 import AccordionHeader from './AccordionHeader';
@@ -14,16 +15,65 @@ const ConfigHalls = ({ halls }) => {
   const [seatTypes, setSeatTypes] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
+
+  // кэш базовой конфигурации (без занятости) по залу
+  // { hallId: { rows, seats, baseSeatTypes } }
+  const [hallConfigs, setHallConfigs] = useState({});
   const [loadedFromServer, setLoadedFromServer] = useState(false);
-  const [hallConfigs, setHallConfigs] = useState({}); 
-  // { hallId: { rows, seats, seatTypes } }
 
   const rows = parseInt(rowsInput, 10) || 1;
   const seatsPerRow = parseInt(seatsInput, 10) || 1;
 
   const toggleOpen = () => setIsOpen(!isOpen);
 
-  // Загружаем конфигурацию при переключении зала
+  // помощник: из строк в числа 0/1/2
+  const toNumericType = (t) => {
+    switch (t) {
+      case 'standart': return 0;
+      case 'vip': return 1;
+      case 'disabled': return 2;
+      default: return 0;
+    }
+  };
+
+  // помощник: из чисел (и taken) обратно в строковый тип для сохранения
+  const toStringType = (v) => {
+    if (v === 'taken') return 'standart'; // сервер не принимает taken
+    switch (v) {
+      case 0: return 'standart';
+      case 1: return 'vip';
+      case 2: return 'disabled';
+      default: return 'standart';
+    }
+  };
+
+  // наложение занятости для СЕГОДНЯ по всем сеансам выбранного зала
+  const applyTakenOverlay = async (baseSeatTypes, hallId, seances) => {
+    const today = new Date().toISOString().split('T')[0];
+    const hallSeances = seances.filter(s => s.seance_hallid === hallId);
+
+    const taken = {}; // key = "r-c"
+    for (const seance of hallSeances) {
+      try {
+        const cfg = await api.getSeanceHallConfig(seance.id, today); // массив строковых типов + "taken"
+        (cfg || []).forEach((row, r) => {
+          row.forEach((cell, c) => {
+            if (cell === 'taken') taken[`${r}-${c}`] = true;
+          });
+        });
+      } catch (e) {
+        // молча пропускаем падения одного из сеансов
+        // console.warn('hallconfig failed for seance', seance.id, e);
+      }
+    }
+
+    // возвращаем слои: где занято — 'taken', иначе оставляем базовый тип
+    return baseSeatTypes.map((row, r) =>
+      row.map((cell, c) => (taken[`${r}-${c}`] ? 'taken' : cell))
+    );
+  };
+
+  // загрузка конфигурации + занятости (для выбранного зала)
   useEffect(() => {
     const fetchHallConfig = async () => {
       const hall = halls.find(h => h.hall_name === selectedHall);
@@ -31,54 +81,47 @@ const ConfigHalls = ({ halls }) => {
 
       setIsLoading(true);
       try {
-        // если есть в кеше
-        if (hallConfigs[hall.id]) {
-          const cfg = hallConfigs[hall.id];
-          setRowsInput(cfg.rows.toString());
-          setSeatsInput(cfg.seats.toString());
-          setSeatTypes(cfg.seatTypes);
-          setLoadedFromServer(true);
-          return;
-        }
-
-        // грузим с сервера
         const allData = await api.getAllData();
         const hallData = allData.halls.find(h => h.id === hall.id);
 
-        if (hallData && hallData.hall_config) {
-          const config = hallData.hall_config; // уже массив
-          const rowCount = parseInt(hallData.hall_rows, 10) || config.length;
-          const placeCount = parseInt(hallData.hall_places, 10) || (config[0]?.length || 0);
-
-          const seatTypesFromServer = config.map(row =>
-            row.map(seat => {
-              switch (seat) {
-                case 'standart': return 0;
-                case 'vip': return 1;
-                case 'disabled': return 2;
-                default: return 0;
-              }
-            })
-          );
-
-          setRowsInput(rowCount.toString());
-          setSeatsInput(placeCount.toString());
-          setSeatTypes(seatTypesFromServer);
-
-          // кешируем
-          setHallConfigs(prev => ({
-            ...prev,
-            [hall.id]: { rows: rowCount, seats: placeCount, seatTypes: seatTypesFromServer }
-          }));
-
-          setLoadedFromServer(true);
-        } else {
-          // дефолт
+        if (!hallData) {
+          // дефолтная сетка если что-то пошло не так
           setRowsInput("10");
           setSeatsInput("8");
           setSeatTypes(Array(10).fill(null).map(() => Array(8).fill(0)));
           setLoadedFromServer(false);
+          return;
         }
+
+        let baseRows, baseSeats, baseSeatTypes;
+
+        // достаём из кэша базовую конфигурацию, либо формируем и кэшируем
+        if (hallConfigs[hall.id]) {
+          baseRows = hallConfigs[hall.id].rows;
+          baseSeats = hallConfigs[hall.id].seats;
+          baseSeatTypes = hallConfigs[hall.id].baseSeatTypes;
+        } else {
+          const config = hallData.hall_config || [];
+          baseRows = parseInt(hallData.hall_rows, 10) || config.length || 10;
+          baseSeats = parseInt(hallData.hall_places, 10) || (config[0]?.length || 8);
+
+          baseSeatTypes = Array.from({ length: baseRows }, (_, r) =>
+            Array.from({ length: baseSeats }, (_, c) => toNumericType(config?.[r]?.[c] ?? 'standart'))
+          );
+
+          setHallConfigs(prev => ({
+            ...prev,
+            [hall.id]: { rows: baseRows, seats: baseSeats, baseSeatTypes }
+          }));
+        }
+
+        // накладываем занятость на сегодня
+        const withTaken = await applyTakenOverlay(baseSeatTypes, hall.id, allData.seances);
+
+        setRowsInput(String(baseRows));
+        setSeatsInput(String(baseSeats));
+        setSeatTypes(withTaken);
+        setLoadedFromServer(true);
       } catch (error) {
         console.error('Ошибка при загрузке конфигурации зала:', error);
         alert('Ошибка при загрузке конфигурации зала: ' + error.message);
@@ -88,9 +131,14 @@ const ConfigHalls = ({ halls }) => {
     };
 
     fetchHallConfig();
-  }, [selectedHall, halls, hallConfigs]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedHall, halls]); // без выбора даты — только при смене зала/списка залов
 
-  // Если меняем ряды/места вручную
+
+
+  
+
+  // Если меняем ряды/места вручную — сбрасываем сетку (без занятости)
   useEffect(() => {
     if (!loadedFromServer) {
       setSeatTypes(
@@ -118,11 +166,16 @@ const ConfigHalls = ({ halls }) => {
   };
 
   const toggleSeatType = (rowIndex, seatIndex) => {
+    // блокируем изменение занятых мест
+    if (seatTypes[rowIndex][seatIndex] === 'taken') return;
+
     setSeatTypes(prev => {
-      const newSeatTypes = prev.map(r => [...r]);
-      const currentType = newSeatTypes[rowIndex][seatIndex];
-      newSeatTypes[rowIndex][seatIndex] = (currentType + 1) % 3;
-      return newSeatTypes;
+      const next = prev.map(r => [...r]);
+      const cur = next[rowIndex][seatIndex];
+      // если вдруг cur строковый (неожиданно), переведём его в 0
+      const value = typeof cur === 'number' ? cur : 0;
+      next[rowIndex][seatIndex] = (value + 1) % 3; // 0 -> 1 -> 2 -> 0
+      return next;
     });
     setIsSaved(false);
     setLoadedFromServer(false);
@@ -137,15 +190,9 @@ const ConfigHalls = ({ halls }) => {
 
     setIsLoading(true);
     try {
+      // при сохранении заменяем 'taken' на 'standart'
       const config = seatTypes.map(row =>
-        row.map(seatType => {
-          switch (seatType) {
-            case 0: return 'standart';
-            case 1: return 'vip';
-            case 2: return 'disabled';
-            default: return 'standart';
-          }
-        })
+        row.map(toStringType)
       );
 
       const payload = {
@@ -154,24 +201,25 @@ const ConfigHalls = ({ halls }) => {
         config: JSON.stringify(config)
       };
 
-      console.log("Отправляем payload:", payload);
-
       const result = await api.request(`/hall/${hall.id}`, {
         method: 'POST',
         body: payload
       });
 
-      console.log("Ответ сервера:", result);
+      // обновляем кэш базовой конфигурации только БАЗОВЫМИ типами (без taken)
+      const baseSeatTypes = seatTypes.map(row =>
+        row.map(cell => (cell === 'taken' ? 0 : cell)) // taken -> 0(standart) в кэше
+      );
 
-      // обновляем кеш
       setHallConfigs(prev => ({
         ...prev,
-        [hall.id]: { rows, seats: seatsPerRow, seatTypes }
+        [hall.id]: { rows, seats: seatsPerRow, baseSeatTypes }
       }));
 
       setIsSaved(true);
       alert('Конфигурация зала успешно сохранена!');
       setLoadedFromServer(true);
+      console.log("✅ Ответ сервера:", result);
     } catch (error) {
       console.error('Ошибка при сохранении конфигурации зала:', error);
       alert('Ошибка при сохранении конфигурации зала: ' + error.message);
@@ -260,7 +308,8 @@ const ConfigHalls = ({ halls }) => {
           <div className="config-hall-legend">
             <div><span className="legend-box seat-normal" /> — обычные кресла</div>
             <div><span className="legend-box seat-vip" /> — VIP кресла</div>
-            <div><span className="legend-box seat-blocked" /> — заблокированные (нет кресла)</div>
+           {/* <div><span className="legend-box seat-blocked" /> — заблокированные (нет кресла)</div> */}
+            <div><span className="legend-box seat-taken" /> — заблокированные (нет кресла)</div>
           </div>
 
           <div className="config-hall-instruction-hint">
@@ -277,7 +326,9 @@ const ConfigHalls = ({ halls }) => {
                       const seatClass =
                         seatType === 0 ? 'seat-normal'
                           : seatType === 1 ? 'seat-vip'
-                            : 'seat-blocked';
+                            : seatType === 2 ? 'seat-blocked'
+                              : seatType === 'taken' ? 'seat-taken'
+                                : 'seat-normal';
 
                       return (
                         <div

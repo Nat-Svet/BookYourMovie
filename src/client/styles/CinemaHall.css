@@ -97,6 +97,7 @@
   border-radius: 4px;
 }
 
+/* Занятое место */
 .busy-seat {
   background: #171d24;
   /* темный цвет для занято */
@@ -119,6 +120,19 @@
   box-shadow: 0 0 4px 0 #16a6af;
   background: #25c4ce;
   /* выбранный голубой */
+}
+
+
+/*.busy-seat {
+  background-color: #dc3545 !important; /* красный (Bootstrap danger) */
+  /*border: 1px solid #a71d2a !important;
+  cursor: not-allowed;
+  opacity: 0.7;
+}*/
+
+/* Чтобы текст/иконка не подсвечивались при клике */
+.busy-seat:disabled {
+  pointer-events: none;
 }
 
 
