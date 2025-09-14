@@ -381,7 +381,7 @@
 }
 
 .config-hall-legend > div {
-  white-space: nowrap; /* 💡 Ключевой стиль */
+  white-space: nowrap; 
   display: flex;
   align-items: center;
 }

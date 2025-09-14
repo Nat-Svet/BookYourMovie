@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import AccordionHeader from './AccordionHeader';
 import poster3 from '../../assets/images/poster3.png';
 import trash from '../../assets/icons/trash.png';
@@ -27,7 +27,17 @@ const Sessions = ({ halls }) => {
   });
   const [isLoading, setIsLoading] = useState(false); // состояние загрузки //
 
+  // для кнопки СОХРАНЕНО!
+  const [isSaved, setIsSaved] = useState(false);
+
   const api = new API();
+
+  // refs для touch-hit-test по залам
+  const timelineRefs = useRef({}); // { [hall_name]: HTMLElement }
+  const trashRefs = useRef({});    // { [hall_name]: HTMLElement }
+
+  // актуальные координаты тача
+  const touchPointRef = useRef({ x: 0, y: 0 });
 
   // Цвет по id фильма //
   const getColorByIndex = (id) => {
@@ -100,6 +110,8 @@ const Sessions = ({ halls }) => {
     })();
 
   }, [halls]);
+
+  
 
   // Удаление фильма //
   const removeMovie = async (id) => {
@@ -234,8 +246,8 @@ const Sessions = ({ halls }) => {
     e.dataTransfer.dropEffect = 'move';
   };
 
-  const onTrashDrop = async (e) => {
-    e.preventDefault();
+  // логика удаления , чтобы вызывать и из touch
+  const deleteDraggedSession = async () => {
     if (!draggedSession) return;
     const { hall, idx } = draggedSession;
 
@@ -273,6 +285,11 @@ const Sessions = ({ halls }) => {
       setIsLoading(false);
       reloadSessions();
     }
+  };
+
+  const onTrashDrop = async (e) => {
+    if (e && e.cancelable) e.preventDefault();
+    await deleteDraggedSession();
   };
 
   // Добавление сеанса через попап //
@@ -339,6 +356,7 @@ const Sessions = ({ halls }) => {
         color: '#ffffff',
         posterFile: null
       });
+      setIsSaved(false); // если верну кнопки — будет корректно
     } catch (error) {
       console.error('Ошибка при отмене:', error);
       alert('Не удалось отменить изменения: ' + error.message);
@@ -347,12 +365,12 @@ const Sessions = ({ halls }) => {
     }
   };
 
-
   const handleSave = async () => {
     if (isLoading) return;
     try {
       setIsLoading(true);
       await reloadSessions();
+      setIsSaved(true); // если верну кнопки — будет "СОХРАНЕНО!"
       alert('Изменения сохранены.');
     } catch (e) {
       console.error('Ошибка при сохранении:', e);
@@ -362,6 +380,78 @@ const Sessions = ({ halls }) => {
     }
   };
 
+  
+  // TOUCH-FALLBACK 
+  
+
+  // утилита проверки точки в элементе
+  const isPointInside = (el, x, y) => {
+    if (!el) return false;
+    const r = el.getBoundingClientRect();
+    return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
+  };
+
+  // touch-обработчики для фильмов (перетаскивание на таймлайн)
+  const handleTouchStartMovie = (movie, e) => {
+    setDraggedMovie(movie);
+    //if (e && e.cancelable) e.preventDefault();
+  };
+
+  // touch-обработчики для сеансов (перетаскивание в корзину)
+  const handleTouchStartSession = (hall, idx, e) => {
+    setDraggedSession({ hall, idx });
+    //if (e && e.cancelable) e.preventDefault();
+  };
+
+  // глобальные обработчики touchmove/touchend — чтобы ловить «дроп» в нужной зоне
+  useEffect(() => {
+    const onDocTouchMove = (e) => {
+      if (!draggedMovie && !draggedSession) return;
+      const t = e.touches[0];
+      touchPointRef.current = { x: t.clientX, y: t.clientY };
+      // не даём странице ехать за пальцем
+      if (e.cancelable) e.preventDefault();
+    };
+
+    const onDocTouchEnd = async (e) => {
+      const { x, y } = touchPointRef.current;
+
+      // Если тащили фильм — проверим, в какой таймлайн попали
+      if (draggedMovie) {
+        let targetHall = null;
+        for (const hallName of Object.keys(timelineRefs.current)) {
+          const el = timelineRefs.current[hallName];
+          if (isPointInside(el, x, y)) {
+            targetHall = hallName;
+            break;
+          }
+        }
+        if (targetHall) {
+          onDrop(targetHall);
+        }
+        setDraggedMovie(null);
+      }
+
+      // Если тащили сеанс — проверим, попали ли на корзину соответствующего зала
+      if (draggedSession) {
+        const hallName = draggedSession.hall;
+        const trashEl = trashRefs.current[hallName];
+        if (isPointInside(trashEl, x, y)) {
+          await deleteDraggedSession(); // та же логика, что при drop
+        }
+        setDraggedSession(null);
+      }
+    };
+
+    // добавляем пассивно=false, чтобы разрешить preventDefault
+    document.addEventListener('touchmove', onDocTouchMove, { passive: false });
+    document.addEventListener('touchend', onDocTouchEnd);
+
+    return () => {
+      document.removeEventListener('touchmove', onDocTouchMove);
+      document.removeEventListener('touchend', onDocTouchEnd);
+    };
+  }, [draggedMovie, draggedSession, sessions, halls]); 
 
   return (
     <section className="sessions-wrapper">
@@ -392,9 +482,11 @@ const Sessions = ({ halls }) => {
               <div
                 key={movie.id}
                 className="movie-card"
-                style={{ backgroundColor: movie.color }}
+                style={{ backgroundColor: movie.color, touchAction: 'none' /* чтобы страница не скроллилась во время тача */ }}
                 draggable={!isLoading}
                 onDragStart={() => !isLoading && onDragStart(movie)}
+                // touch-fallback
+                onTouchStart={(e) => !isLoading && handleTouchStartMovie(movie, e)}
               >
                 <img
                   src={movie.image}
@@ -425,18 +517,21 @@ const Sessions = ({ halls }) => {
               <div key={id} className="hall-schedule" style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
                 <div
                   className="schedule-trash"
+                  ref={(el) => { trashRefs.current[hall_name] = el; }} // привязали ref корзины
                   onDragOver={onTrashDragOver}
                   onDrop={onTrashDrop}
                   title="Перетащите сюда сеанс для удаления"
-                  style={{ visibility: draggedSession?.hall === hall_name ? 'visible' : 'hidden' }}
+                  style={{ visibility: draggedSession?.hall === hall_name ? 'visible' : 'hidden', touchAction: 'none' /* ⭐ */ }}
                 >
                   <img src={trash} alt="Удалить сеанс" />
                 </div>
 
                 <div
                   className="timeline-wrapper"
+                  ref={(el) => { timelineRefs.current[hall_name] = el; }} // привязали ref таймлайна
                   onDragOver={e => e.preventDefault()}
                   onDrop={() => !isLoading && onDrop(hall_name)}
+                  style={{ touchAction: 'none' /* ⭐ */ }}
                 >
                   <div className="hall-name">{hall_name}</div>
 
@@ -461,11 +556,14 @@ const Sessions = ({ halls }) => {
                             style={{
                               left: `${leftPct}%`,
                               width: `${widthPct}%`,
-                              backgroundColor: movie.color
+                              backgroundColor: movie.color,
+                              touchAction: 'none' /* ⭐ */
                             }}
                             draggable={!isLoading}
                             onDragStart={!isLoading ? onSessionDragStart(hall_name, idx) : undefined}
                             onDragEnd={onSessionDragEnd}
+                            // touch-fallback: старт перетаскивания сеанса
+                            onTouchStart={(e) => !isLoading && handleTouchStartSession(hall_name, idx, e)}
                           >
                             {movie.title}
                           </div>
@@ -501,6 +599,7 @@ const Sessions = ({ halls }) => {
           })}
 
           {/* Кнопки сохранения / отмены */}
+          {/* 
           <div className="buttons-row">
             <button
               className="btn cancel-btn"
@@ -514,10 +613,11 @@ const Sessions = ({ halls }) => {
               onClick={handleSave}
               disabled={isLoading}
             >
-              {isLoading ? 'СОХРАНЕНИЕ...' : 'СОХРАНИТЬ'}
+              {isLoading ? 'СОХРАНЕНИЕ...' : (isSaved ? 'СОХРАНЕНО!' : 'СОХРАНИТЬ')}
             </button>
-
           </div>
+          */}
+          
         </div>
       )}
 

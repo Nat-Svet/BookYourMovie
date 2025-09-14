@@ -1,4 +1,4 @@
-// ConfigHalls.js
+
 import React, { useState, useEffect } from 'react';
 import "bootstrap/dist/css/bootstrap.min.css";
 import AccordionHeader from './AccordionHeader';
@@ -16,8 +16,8 @@ const ConfigHalls = ({ halls }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
 
-  // кэш базовой конфигурации (без занятости) по залу
-  // { hallId: { rows, seats, baseSeatTypes } }
+  // базовая конфигурация (без занятости) по залу
+  
   const [hallConfigs, setHallConfigs] = useState({});
   const [loadedFromServer, setLoadedFromServer] = useState(false);
 
@@ -26,7 +26,7 @@ const ConfigHalls = ({ halls }) => {
 
   const toggleOpen = () => setIsOpen(!isOpen);
 
-  // помощник: из строк в числа 0/1/2
+  
   const toNumericType = (t) => {
     switch (t) {
       case 'standart': return 0;
@@ -36,9 +36,9 @@ const ConfigHalls = ({ halls }) => {
     }
   };
 
-  // помощник: из чисел (и taken) обратно в строковый тип для сохранения
+  
   const toStringType = (v) => {
-    if (v === 'taken') return 'standart'; // сервер не принимает taken
+    if (v === 'taken') return 'standart'; 
     switch (v) {
       case 0: return 'standart';
       case 1: return 'vip';
@@ -47,33 +47,32 @@ const ConfigHalls = ({ halls }) => {
     }
   };
 
-  // наложение занятости для СЕГОДНЯ по всем сеансам выбранного зала
+  
   const applyTakenOverlay = async (baseSeatTypes, hallId, seances) => {
     const today = new Date().toISOString().split('T')[0];
     const hallSeances = seances.filter(s => s.seance_hallid === hallId);
 
-    const taken = {}; // key = "r-c"
+    const taken = {}; 
     for (const seance of hallSeances) {
       try {
-        const cfg = await api.getSeanceHallConfig(seance.id, today); // массив строковых типов + "taken"
+        const cfg = await api.getSeanceHallConfig(seance.id, today); 
         (cfg || []).forEach((row, r) => {
           row.forEach((cell, c) => {
             if (cell === 'taken') taken[`${r}-${c}`] = true;
           });
         });
       } catch (e) {
-        // молча пропускаем падения одного из сеансов
-        // console.warn('hallconfig failed for seance', seance.id, e);
+        
       }
     }
 
-    // возвращаем слои: где занято — 'taken', иначе оставляем базовый тип
+    
     return baseSeatTypes.map((row, r) =>
       row.map((cell, c) => (taken[`${r}-${c}`] ? 'taken' : cell))
     );
   };
 
-  // загрузка конфигурации + занятости (для выбранного зала)
+  
   useEffect(() => {
     const fetchHallConfig = async () => {
       const hall = halls.find(h => h.hall_name === selectedHall);
@@ -85,7 +84,7 @@ const ConfigHalls = ({ halls }) => {
         const hallData = allData.halls.find(h => h.id === hall.id);
 
         if (!hallData) {
-          // дефолтная сетка если что-то пошло не так
+          
           setRowsInput("10");
           setSeatsInput("8");
           setSeatTypes(Array(10).fill(null).map(() => Array(8).fill(0)));
@@ -95,7 +94,7 @@ const ConfigHalls = ({ halls }) => {
 
         let baseRows, baseSeats, baseSeatTypes;
 
-        // достаём из кэша базовую конфигурацию, либо формируем и кэшируем
+        
         if (hallConfigs[hall.id]) {
           baseRows = hallConfigs[hall.id].rows;
           baseSeats = hallConfigs[hall.id].seats;
@@ -115,7 +114,7 @@ const ConfigHalls = ({ halls }) => {
           }));
         }
 
-        // накладываем занятость на сегодня
+        
         const withTaken = await applyTakenOverlay(baseSeatTypes, hall.id, allData.seances);
 
         setRowsInput(String(baseRows));
@@ -131,14 +130,13 @@ const ConfigHalls = ({ halls }) => {
     };
 
     fetchHallConfig();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedHall, halls]); // без выбора даты — только при смене зала/списка залов
-
+    
+  }, [selectedHall, halls]); 
 
 
   
 
-  // Если меняем ряды/места вручную — сбрасываем сетку (без занятости)
+  
   useEffect(() => {
     if (!loadedFromServer) {
       setSeatTypes(
@@ -166,13 +164,13 @@ const ConfigHalls = ({ halls }) => {
   };
 
   const toggleSeatType = (rowIndex, seatIndex) => {
-    // блокируем изменение занятых мест
+    
     if (seatTypes[rowIndex][seatIndex] === 'taken') return;
 
     setSeatTypes(prev => {
       const next = prev.map(r => [...r]);
       const cur = next[rowIndex][seatIndex];
-      // если вдруг cur строковый (неожиданно), переведём его в 0
+      
       const value = typeof cur === 'number' ? cur : 0;
       next[rowIndex][seatIndex] = (value + 1) % 3; // 0 -> 1 -> 2 -> 0
       return next;
@@ -190,7 +188,7 @@ const ConfigHalls = ({ halls }) => {
 
     setIsLoading(true);
     try {
-      // при сохранении заменяем 'taken' на 'standart'
+      
       const config = seatTypes.map(row =>
         row.map(toStringType)
       );
@@ -206,9 +204,9 @@ const ConfigHalls = ({ halls }) => {
         body: payload
       });
 
-      // обновляем кэш базовой конфигурации только БАЗОВЫМИ типами (без taken)
+      
       const baseSeatTypes = seatTypes.map(row =>
-        row.map(cell => (cell === 'taken' ? 0 : cell)) // taken -> 0(standart) в кэше
+        row.map(cell => (cell === 'taken' ? 0 : cell)) 
       );
 
       setHallConfigs(prev => ({

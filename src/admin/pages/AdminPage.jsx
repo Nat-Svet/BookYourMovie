@@ -12,57 +12,63 @@ import API from '../../api/api';
 const api = new API();
 
 const AdminPage = () => {
-  const [halls, setHalls] = useState([]); // Список залов //
-  const [loading, setLoading] = useState(true); // Состояние загрузки //
+  const [halls, setHalls] = useState([]);
+  const [hallStates, setHallStates] = useState({});
+  const [loading, setLoading] = useState(true);
 
-  // Функция для загрузки залов с сервера //
   const fetchHalls = useCallback(async () => {
     try {
-      const data = await api.getAllData(); // получаем все данные (фильмы, сеансы, залы и т.д.) //
-      // Берём список залов из ответа //
+      const data = await api.getAllData();
       const hallsList = Array.isArray(data.halls) ? data.halls : Array.isArray(data) ? data : [];
-      // Отфильтровываем лишние (например, временные залы с именем temp-) // 
+
       const filtered = hallsList.filter(h => h.hall_name && !h.hall_name.startsWith('temp-'));
-      setHalls(filtered); // сохраняем в состояние //
+      setHalls(filtered);
+
+      // Загружаем сохранённые состояния из localStorage
+      const stored = localStorage.getItem("hallStates");
+      const savedStates = stored ? JSON.parse(stored) : {};
+
+      const newStates = {};
+      filtered.forEach(h => {
+        newStates[h.hall_name] = savedStates[h.hall_name] || false;
+      });
+
+      setHallStates(newStates);
     } catch (err) {
-      console.error('❌ Ошибка загрузки залов:', err);
+      console.error('Ошибка загрузки залов:', err);
       alert('Ошибка при загрузке залов: ' + (err?.message || err));
     } finally {
-      setLoading(false); // выключаем индикатор загрузки //
+      setLoading(false);
     }
   }, []);
 
-  // Загружаем залы при первой загрузке страницы //
   useEffect(() => {
     fetchHalls();
   }, [fetchHalls]);
 
-  // Добавление нового зала //
   const addHall = async (hallName) => {
     try {
-      await api.createHall({ hallName }); // создаём зал на сервере //
-      await fetchHalls(); // обновляем список залов //
+      await api.createHall({ hallName });
+      await fetchHalls();
     } catch (err) {
-      console.error('❌ Ошибка при добавлении зала:', err);
+      console.error('Ошибка при добавлении зала:', err);
       alert(err?.message || 'Ошибка при добавлении зала');
     }
   };
 
-  // Удаление зала //
   const deleteHall = async (hallId) => {
     const confirmDelete = window.confirm('Удалить этот зал? Сеансы будут удалены тоже!');
-    if (!confirmDelete) return; // если пользователь передумал — выходим //
+    if (!confirmDelete) return;
 
     try {
-      await api.deleteHall(hallId); // удаляем на сервере //
-      await fetchHalls(); // обновляем список залов //
+      await api.deleteHall(hallId);
+      await fetchHalls();
     } catch (err) {
-      console.error('❌ Ошибка при удалении зала:', err);
+      console.error('Ошибка при удалении зала:', err);
       alert(err?.message || 'Ошибка при удалении зала');
     }
   };
 
-  // 🔑 Обновление цен у конкретного зала в state (без повторного запроса к серверу)
   const handleUpdateHall = (hallId, priceStandart, priceVip) => {
     setHalls(prev =>
       prev.map(h =>
@@ -78,21 +84,14 @@ const AdminPage = () => {
       <AdminHeader />
       <div className="admin-page-wrapper">
         {loading ? (
-          // Если залы ещё загружаются — показываем текст //
           <p>Загрузка залов...</p>
         ) : (
-          // Когда залы загружены — показываем все блоки админки //
           <>
-            <ManageHalls
-              halls={halls}
-              onAddHall={addHall}
-              onDeleteHall={deleteHall}
-            />
+            <ManageHalls halls={halls} onAddHall={addHall} onDeleteHall={deleteHall} />
             <ConfigHalls halls={halls} />
-            {/* ✅ сюда пробрасываем onUpdateHall */}
             <ConfigPrices halls={halls} onUpdateHall={handleUpdateHall} />
             <Sessions halls={halls} />
-            <OpenSale halls={halls} />
+            <OpenSale halls={halls} hallStates={hallStates} setHallStates={setHallStates} />
           </>
         )}
       </div>

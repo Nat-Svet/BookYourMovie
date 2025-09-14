@@ -29,17 +29,21 @@ const ConfigPrices = ({ halls, onUpdateHall }) => {
     }
   }, [halls, selectedHall]);
 
-  // При переключении зала подгружаем его цены
+  // Загружаем цены, когда приходят новые данные залов
   useEffect(() => {
     if (selectedHall && halls.length > 0) {
       const hall = halls.find(h => h.hall_name === selectedHall);
       if (hall) {
         setNormalPrice(String(hall.hall_price_standart || 1));
         setVipPrice(String(hall.hall_price_vip || 1));
-        setIsSaved(false);
       }
     }
-  }, [selectedHall, halls]);
+  }, [halls, selectedHall]);
+
+  // Сбрасываем "сохранено" при смене зала
+  useEffect(() => {
+    setIsSaved(false);
+  }, [selectedHall]);
 
   // Сохранение цен
   const handleSave = async () => {
@@ -60,7 +64,6 @@ const ConfigPrices = ({ halls, onUpdateHall }) => {
         priceVip
       });
 
-      // ✅ обновляем локально (и в родителе, если передан onUpdateHall)
       if (onUpdateHall) {
         onUpdateHall(hall.id, priceStandart, priceVip);
       }
@@ -77,7 +80,6 @@ const ConfigPrices = ({ halls, onUpdateHall }) => {
     }
   };
 
-  // Отмена изменений — сброс к исходным
   const handleCancel = () => {
     const hall = halls.find(h => h.hall_name === selectedHall);
     if (hall) {
@@ -87,14 +89,24 @@ const ConfigPrices = ({ halls, onUpdateHall }) => {
     }
   };
 
-  // Обработчики изменения цен (разрешаем пустое поле)
+  // защита от < 1
   const handleNormalPriceChange = (e) => {
-    setNormalPrice(e.target.value);
+    const value = e.target.value;
+    if (value === '') {
+      setNormalPrice('');
+    } else {
+      setNormalPrice(String(Math.max(1, Number(value))));
+    }
     setIsSaved(false);
   };
 
   const handleVipPriceChange = (e) => {
-    setVipPrice(e.target.value);
+    const value = e.target.value;
+    if (value === '') {
+      setVipPrice('');
+    } else {
+      setVipPrice(String(Math.max(1, Number(value))));
+    }
     setIsSaved(false);
   };
 
