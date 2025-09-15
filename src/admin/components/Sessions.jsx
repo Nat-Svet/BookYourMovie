@@ -8,7 +8,7 @@ import '../styles/Sessions.css';
 
 const DAY_MIN = 24 * 60; // Кол-во минут в сутках //
 
-const Sessions = ({ halls }) => {
+const Sessions = ({ halls, moviesData, sessionsData, onRefreshAllData }) => {
   const [isOpen, setIsOpen] = useState(true); // открыт ли аккордеон //
   const [movies, setMovies] = useState([]); // список фильмов //
   const [sessions, setSessions] = useState({}); // сеансы по залам //
@@ -27,16 +27,16 @@ const Sessions = ({ halls }) => {
   });
   const [isLoading, setIsLoading] = useState(false); // состояние загрузки //
 
-  // для кнопки СОХРАНЕНО!
+  // для кнопки СОХРАНЕНО! //
   const [isSaved, setIsSaved] = useState(false);
 
   const api = new API();
 
-  // refs для touch-hit-test по залам
-  const timelineRefs = useRef({}); // { [hall_name]: HTMLElement }
-  const trashRefs = useRef({});    // { [hall_name]: HTMLElement }
+  // refs для touch-hit-test по залам //
+  const timelineRefs = useRef({}); // { [hall_name]: HTMLElement } //
+  const trashRefs = useRef({});    // { [hall_name]: HTMLElement } //
 
-  // актуальные координаты тача
+  // актуальные координаты тача //
   const touchPointRef = useRef({ x: 0, y: 0 });
 
   // Цвет по id фильма //
@@ -45,7 +45,7 @@ const Sessions = ({ halls }) => {
     return colors[(id - 1) % colors.length];
   };
 
-  // переключение аккордиона //
+  // переключение аккордеона //
   const toggleOpen = () => setIsOpen(!isOpen);
 
   // Преобразование сеансов с сервера в формат: { "Зал 1": [сеанс, сеанс] } //
@@ -68,50 +68,39 @@ const Sessions = ({ halls }) => {
     return sessionsByHall;
   };
 
-  // Загрузка всех фильмов и сеансов //
-  const loadAllData = async () => {
-    const token = localStorage.getItem('token');
-    if (token) api.setToken(token);
-
-    const data = await api.getAllData();
-
-    const formattedMovies = (data.films || []).map(film => ({
-      id: film.id,
-      title: film.film_name,
-      duration: film.film_duration,
-      description: film.film_description || '',
-      country: film.film_origin || '',
-      color: getColorByIndex(film.id),
-      image: film.film_poster || poster3
-    }));
-
-    setMovies(formattedMovies);
-    setSessions(transformSeances(data.seances));
-  };
+  
 
   // Обновление сеансов без фильмов //
-  const reloadSessions = async () => {
-    try {
-      const data = await api.getAllData();
-      setSessions(transformSeances(data.seances));
-    } catch (error) {
-      console.error('Ошибка при загрузке сеансов:', error);
-    }
-  };
+ const reloadSessions = async () => {
+  try {
+    const data = await api.getAllData(); // локально //
+    setSessions(transformSeances(data.seances));
+  } catch (error) {
+    console.error('Ошибка при загрузке сеансов:', error);
+  }
+};
 
-  // Эффект при загрузке/изменении залов //
+
+
+  // СИНХРОНИЗАЦИЯ С РОДИТЕЛЕМ (вместо второго запроса на монтировании) //
   useEffect(() => {
+    // AdminPage передал данные — используем их //
+    if (typeof moviesData !== 'undefined') setMovies(moviesData);
+    if (typeof sessionsData !== 'undefined') setSessions(sessionsData);
+  }, [moviesData, sessionsData]);
+
+  useEffect(() => {
+  if (typeof moviesData === 'undefined' && typeof sessionsData === 'undefined') {
     (async () => {
       try {
-        await loadAllData();
+        await onRefreshAllData?.(); // fallback: если родитель не дал данные //
       } catch (e) {
-        console.error('Ошибка при загрузке данных:', e);
+        console.error('Ошибка при загрузке данных (fallback):', e);
       }
     })();
+  }
+}, []);
 
-  }, [halls]);
-
-  
 
   // Удаление фильма //
   const removeMovie = async (id) => {
@@ -119,10 +108,10 @@ const Sessions = ({ halls }) => {
       setIsLoading(true);
       await api.deleteMovie(id);
 
-      // локально удалить фильм
+      // локально удалить фильм //
       setMovies(prev => prev.filter(movie => movie.id !== id));
 
-      // удалить сеансы с этим фильмом
+      // удалить сеансы с этим фильмом //
       setSessions(prev => {
         const updated = {};
         for (const hall in prev) {
@@ -210,9 +199,9 @@ const Sessions = ({ halls }) => {
       }
 
       await api.createMovie(formData);
+      await onRefreshAllData(); // вместо local loadAllData //
 
-      // После успешного добавления — перечитываем alldata и пересобираем состояние
-      await loadAllData();
+      
 
       closeAddMoviePopup();
       alert('Фильм успешно добавлен!');
@@ -246,7 +235,7 @@ const Sessions = ({ halls }) => {
     e.dataTransfer.dropEffect = 'move';
   };
 
-  // логика удаления , чтобы вызывать и из touch
+  // логика удаления , чтобы вызывать из из touch //
   const deleteDraggedSession = async () => {
     if (!draggedSession) return;
     const { hall, idx } = draggedSession;
@@ -342,8 +331,9 @@ const Sessions = ({ halls }) => {
     if (isLoading) return;
     try {
       setIsLoading(true);
-      // Перечитываем данные с сервера //
-      await loadAllData();
+      
+      await onRefreshAllData?.(); // корректный способ синхронизации //
+
 
       // Закрываем попапы и чистим временные states //
       setPopupData({ visible: false, movieId: null, hall: '', time: '' });
@@ -356,7 +346,7 @@ const Sessions = ({ halls }) => {
         color: '#ffffff',
         posterFile: null
       });
-      setIsSaved(false); // если верну кнопки — будет корректно
+      setIsSaved(false); // если верну кнопки — будет корректно //
     } catch (error) {
       console.error('Ошибка при отмене:', error);
       alert('Не удалось отменить изменения: ' + error.message);
@@ -370,7 +360,7 @@ const Sessions = ({ halls }) => {
     try {
       setIsLoading(true);
       await reloadSessions();
-      setIsSaved(true); // если верну кнопки — будет "СОХРАНЕНО!"
+      setIsSaved(true); // если верну кнопки — будет "СОХРАНЕНО!" //
       alert('Изменения сохранены.');
     } catch (e) {
       console.error('Ошибка при сохранении:', e);
@@ -380,43 +370,41 @@ const Sessions = ({ halls }) => {
     }
   };
 
-  
-  // TOUCH-FALLBACK 
-  
+  // TOUCH-FALLBACK  //
 
-  // утилита проверки точки в элементе
+  // утилита проверки точки в элементе //
   const isPointInside = (el, x, y) => {
     if (!el) return false;
     const r = el.getBoundingClientRect();
     return x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
   };
 
-  // touch-обработчики для фильмов (перетаскивание на таймлайн)
+  // touch-обработчики для фильмов (перетаскивание на таймлайн) //
   const handleTouchStartMovie = (movie, e) => {
     setDraggedMovie(movie);
-    //if (e && e.cancelable) e.preventDefault();
+    //if (e && e.cancelable) e.preventDefault(); //
   };
 
-  // touch-обработчики для сеансов (перетаскивание в корзину)
+  // touch-обработчики для сеансов (перетаскивание в корзину) //
   const handleTouchStartSession = (hall, idx, e) => {
     setDraggedSession({ hall, idx });
-    //if (e && e.cancelable) e.preventDefault();
+    //if (e && e.cancelable) e.preventDefault(); //
   };
 
-  // глобальные обработчики touchmove/touchend — чтобы ловить «дроп» в нужной зоне
+  // глобальные обработчики touchmove/touchend — чтобы ловить «дроп» в нужной зоне //
   useEffect(() => {
     const onDocTouchMove = (e) => {
       if (!draggedMovie && !draggedSession) return;
       const t = e.touches[0];
       touchPointRef.current = { x: t.clientX, y: t.clientY };
-      // не даём странице ехать за пальцем
+      // не даём странице ехать за пальцем //
       if (e.cancelable) e.preventDefault();
     };
 
     const onDocTouchEnd = async (e) => {
       const { x, y } = touchPointRef.current;
 
-      // Если тащили фильм — проверим, в какой таймлайн попали
+      // Если тащили фильм — проверим, в какой таймлайн попали //
       if (draggedMovie) {
         let targetHall = null;
         for (const hallName of Object.keys(timelineRefs.current)) {
@@ -432,18 +420,18 @@ const Sessions = ({ halls }) => {
         setDraggedMovie(null);
       }
 
-      // Если тащили сеанс — проверим, попали ли на корзину соответствующего зала
+      // Если тащили сеанс — проверим, попали ли на корзину соответствующего зала //
       if (draggedSession) {
         const hallName = draggedSession.hall;
         const trashEl = trashRefs.current[hallName];
         if (isPointInside(trashEl, x, y)) {
-          await deleteDraggedSession(); // та же логика, что при drop
+          await deleteDraggedSession(); // та же логика, что при drop //
         }
         setDraggedSession(null);
       }
     };
 
-    // добавляем пассивно=false, чтобы разрешить preventDefault
+    // добавляем пассивно=false, чтобы разрешить preventDefault //
     document.addEventListener('touchmove', onDocTouchMove, { passive: false });
     document.addEventListener('touchend', onDocTouchEnd);
 
@@ -485,7 +473,7 @@ const Sessions = ({ halls }) => {
                 style={{ backgroundColor: movie.color, touchAction: 'none' /* чтобы страница не скроллилась во время тача */ }}
                 draggable={!isLoading}
                 onDragStart={() => !isLoading && onDragStart(movie)}
-                // touch-fallback
+                // touch-fallback //
                 onTouchStart={(e) => !isLoading && handleTouchStartMovie(movie, e)}
               >
                 <img
@@ -517,21 +505,21 @@ const Sessions = ({ halls }) => {
               <div key={id} className="hall-schedule" style={{ display: 'flex', alignItems: 'center', marginBottom: 20 }}>
                 <div
                   className="schedule-trash"
-                  ref={(el) => { trashRefs.current[hall_name] = el; }} // привязали ref корзины
+                  ref={(el) => { trashRefs.current[hall_name] = el; }} // привязали ref корзины //
                   onDragOver={onTrashDragOver}
                   onDrop={onTrashDrop}
                   title="Перетащите сюда сеанс для удаления"
-                  style={{ visibility: draggedSession?.hall === hall_name ? 'visible' : 'hidden', touchAction: 'none' /* ⭐ */ }}
+                  style={{ visibility: draggedSession?.hall === hall_name ? 'visible' : 'hidden', touchAction: 'none' /* ? */ }}
                 >
                   <img src={trash} alt="Удалить сеанс" />
                 </div>
 
                 <div
                   className="timeline-wrapper"
-                  ref={(el) => { timelineRefs.current[hall_name] = el; }} // привязали ref таймлайна
+                  ref={(el) => { timelineRefs.current[hall_name] = el; }} // привязали ref таймлайна //
                   onDragOver={e => e.preventDefault()}
                   onDrop={() => !isLoading && onDrop(hall_name)}
-                  style={{ touchAction: 'none' /* ⭐ */ }}
+                  style={{ touchAction: 'none' /* проверить */ }}
                 >
                   <div className="hall-name">{hall_name}</div>
 
@@ -557,12 +545,12 @@ const Sessions = ({ halls }) => {
                               left: `${leftPct}%`,
                               width: `${widthPct}%`,
                               backgroundColor: movie.color,
-                              touchAction: 'none' /* ⭐ */
+                              touchAction: 'none' 
                             }}
                             draggable={!isLoading}
                             onDragStart={!isLoading ? onSessionDragStart(hall_name, idx) : undefined}
                             onDragEnd={onSessionDragEnd}
-                            // touch-fallback: старт перетаскивания сеанса
+                            // touch-fallback: старт перетаскивания сеанса //
                             onTouchStart={(e) => !isLoading && handleTouchStartSession(hall_name, idx, e)}
                           >
                             {movie.title}

@@ -86,7 +86,7 @@
   width: 100%;
   box-sizing: border-box;
   background-color: white;
-  text-transform: uppercase;
+  /*text-transform: uppercase;*/
 }
 
 .popup-field textarea {
@@ -153,5 +153,33 @@
 @media (max-width: 640px) {
   .popup {
     width: 100%;
+    max-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .popup-body {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    max-height: calc(100vh - 150px); /* с запасом на header + footer */
+    padding: 20px;
+  }
+
+  .popup-field {
+    max-width: 100%;
+  }
+
+  .popup-field input[type="file"] {
+    max-width: 100%;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .popup-field label {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
   }
 }
